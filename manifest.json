@@ -1,0 +1,27 @@
+{
+  "name":"遊戯王DB⇔Wiki",
+  "version":"1.0",
+  "manifest_version":2,
+  "description": "遊戯王公式データベースと遊戯王カードWikiの「カードの詳細ページ」を相互に行き来できる拡張機能です。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png"
+  },
+
+  "permissions":[
+    "tabs"
+  ],
+
+  "background":{
+    "scripts":[
+      "background.js"
+    ],
+    "persistent": false
+  },
+
+  "page_action":{
+    "default_title": "遊戯王DB⇔Wiki",
+    "default_popup":"popup.html"
+  }
+
+}
