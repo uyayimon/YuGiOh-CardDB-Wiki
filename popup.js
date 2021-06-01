@@ -1,4 +1,4 @@
-chrome.tabs.getSelected(null, function (tab) {
+chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
   // 機種依存文字の対応
   const cardArray = [
@@ -40,28 +40,26 @@ chrome.tabs.getSelected(null, function (tab) {
   ]
 
   // 半角→全角
-  const hankaku2Zenkaku = function (str) {
-    return str.replace(/[A-Za-z0-9]/g, function (s) {
+  const hankaku2Zenkaku = (str) => {
+    return str.replace(/[A-Za-z0-9]/g, (s) => {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
     });
   }
-
-  const pageName = tab.title;
 
   let cardName;
   let substitutedCardName;
   let googleSearchWord;
 
-  const dbWikiLink = document.querySelector('#site_link');
-  const googleSearchLink = document.querySelector('#google_search_link');
+  const pageName = tab[0].title;
 
+  const dbWikiLink = document.getElementById('site_link');
+  const dbWikitext = document.getElementById('site_link_text');
+  const googleSearchLink = document.getElementById('google_search_link');
 
-  if (tab.url.match(/www.db.yugioh-card.com/)) {
+  if (tab[0].url.match(/www.db.yugioh-card.com/)) {
 
-    const bar = pageName.indexOf(' | ');
-    cardName = pageName.substr(0, bar);
-
-    substitutedCardName = cardName;
+    const barPosition = pageName.indexOf(' | ');
+    cardName = pageName.substr(0, barPosition);
 
     // 機種依存文字の表記変換
     for (let i in cardArray) {
@@ -69,23 +67,23 @@ chrome.tabs.getSelected(null, function (tab) {
         substitutedCardName = cardArray[i][1];
         break;
       }
+      substitutedCardName = cardName;
     }
 
-    // ローマ数字
+    // ローマ数字をアルファベットに変換
     for (let i in romanNumeral) {
       substitutedCardName = substitutedCardName.split(romanNumeral[i][0]).join(romanNumeral[i][1]);
     }
 
+    // ハイフンを全角に変換
     substitutedCardName = substitutedCardName.replace(/-/g, '－');
 
-
-    // 半角文字を全角に変換
+    // 半角アルファベットを全角に変換
     const zenkakuCardName = hankaku2Zenkaku(substitutedCardName);
-
 
     // 文字エンコード
     const keywordArray = [];
-    for (let i = 0; i < zenkakuCardName.length; i++) {
+    for (let i in zenkakuCardName) {
       keywordArray.push(zenkakuCardName.charCodeAt(i));
     }
     const eucjpArray = Encoding.convert(keywordArray, 'EUCJP', 'AUTO');
@@ -93,16 +91,14 @@ chrome.tabs.getSelected(null, function (tab) {
 
     substitutedCardName = zenkakuCardName;
 
-    dbWikiLink.innerHTML = '遊戯王カードWikiで表示';
+    dbWikitext.innerText = '遊戯王カードWikiで表示';
     dbWikiLink.href = `https://yugioh-wiki.net/index.php?%A1%D4${encodedKeyword}%A1%D5`;
   }
 
-  if (tab.url.match(/yugioh-wiki.net/)) {
+  if (tab[0].url.match(/yugioh-wiki.net/)) {
     const leftBracket = pageName.indexOf('《');
     const rightBracket = pageName.indexOf('》');
     cardName = pageName.substring((leftBracket + 1), (rightBracket));
-
-    substitutedCardName = cardName;
 
     // 機種依存文字の表記変換
     for (let i in cardArray) {
@@ -110,23 +106,24 @@ chrome.tabs.getSelected(null, function (tab) {
         substitutedCardName = cardArray[i][0];
         break;
       }
+      substitutedCardName = cardName;
     }
 
-    dbWikiLink.innerHTML = '遊戯王公式データベースで検索';
+    dbWikitext.innerText = '遊戯王公式データベースで検索';
     dbWikiLink.href = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&keyword=${substitutedCardName}`;
   }
 
-  document.querySelector('#card_name').innerHTML = `${cardName}<br>${substitutedCardName}`;
+  document.getElementById('card_name').innerText = cardName;
 
 
-  googleSearchLink.addEventListener('click', function () {
-    if (document.querySelector('#search_word').checked) {
-      googleSearchWord = `https://www.google.com/search?q=${cardName} 遊戯王`;
+  googleSearchLink.addEventListener('click', () => {
+    if (document.getElementById('search_word').checked) {
+      googleSearchWord = cardName + ' 遊戯王';
     }
     else {
-      googleSearchWord = `https://www.google.com/search?q=${cardName}`;
+      googleSearchWord = cardName;
     }
 
-    googleSearchLink.href = googleSearchWord;
+    googleSearchLink.href = `https://www.google.com/search?q=${googleSearchWord}`;
   });
 });
