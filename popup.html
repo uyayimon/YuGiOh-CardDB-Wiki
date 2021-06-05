@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <style>
     body {
-      width: 220px;
+      width: max-content;
+      max-width: 220px;
     }
     a {
       font-size: 1.3em;
@@ -22,7 +23,7 @@
 
     @-moz-document url-prefix(){
       body {
-        width: 260px;
+        max-width: 275px;
       }
       a {
         font-size: 1em;
@@ -49,6 +50,7 @@
     <label><input id="search_word" type="checkbox">検索ワードに「遊戯王」を含める</label>
   </div>
 
+  <script src="PDC_list_json.js"></script>
   <script src="encoding.js"></script>
   <script src="popup.js"></script>
 </body>
