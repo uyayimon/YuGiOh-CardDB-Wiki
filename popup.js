@@ -1,3 +1,11 @@
+// Encoding.convert() and Encoding.urlEncode() are functions by
+
+// encoding.js
+// Copyright (c) 2014-2019 Polygon Planet
+// MIT License
+// https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
+
+
 chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
   // ローマ数字の変換リスト
@@ -40,20 +48,20 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       replacedCardName = cardName;
     }
 
-    // ローマ数字をアルファベットに変換
+    // ローマ数字→アルファベット
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(key).join(value);
     }
 
     replacedCardName = replacedCardName.replace(/-/g, '－');
 
-    // 半角アルファベットを全角に変換
+    // 半角→全角
     replacedCardName = replacedCardName.replace(/[A-Za-z0-9]/g, (s) => {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
     });
 
     if (urlMatched(/yugiohdb/)) {
-      // 文字エンコード(encoding.js)
+      // エンコード
       const keywordArray = [];
       for (let i = 0; i < replacedCardName.length; i++) {
         keywordArray.push(replacedCardName.charCodeAt(i));
@@ -85,7 +93,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       replacedCardName = cardName;
     }
 
-    // アルファベットをローマ数字に変換
+    // アルファベット→ローマ数字
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(value).join(key);
     }
@@ -101,12 +109,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
   }
 
-  document.getElementById('card_name').innerText = cardName
-    // + "\n" +
-    // replacedCardName
-    // + "\n" +
-    // siteLink.href
-    ;
+  document.getElementById('card_name').innerText = cardName;
 
 
   googleSearchLink.addEventListener('click', () => {
