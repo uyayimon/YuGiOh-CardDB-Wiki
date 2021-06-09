@@ -29,7 +29,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   const pageName = tab[0].title;
   let cardName;
   let replacedCardName;
-  let googleSearchWord;
 
   const urlMatched = (urlPartial) => {
     return tab[0].url.match(urlPartial);
@@ -39,7 +38,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     const barPosition = pageName.indexOf(' | ');
     cardName = pageName.substr(0, barPosition);
 
-    // 機種依存文字の表記変換
+    // 機種依存文字を含まない名前に変換
     const foundCardName = platformDependentCharCardList.find(({ official_name }) => official_name == cardName);
     if (foundCardName != undefined) {
       replacedCardName = foundCardName.Wiki_name;
@@ -84,7 +83,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     const rightBracket = pageName.indexOf('》');
     cardName = pageName.substring((leftBracket + 1), (rightBracket));
 
-    // 機種依存文字の表記変換
+    // 機種依存文字を含む名前に変換
     const foundCardName = platformDependentCharCardList.find(({ Wiki_name }) => Wiki_name == cardName);
     if (foundCardName != undefined) {
       replacedCardName = foundCardName.official_name;
@@ -106,18 +105,20 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       siteLinkText.innerText = '遊戯王OCGデータベースで検索';
       siteLink.href = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&keyword=${replacedCardName}`;
     }
-
   }
 
   document.getElementById('card_name').innerText = cardName;
 
 
   googleSearchLink.addEventListener('click', () => {
-    if (document.getElementById('search_word').checked) {
-      googleSearchWord = cardName + ' 遊戯王';
+    let googleSearchWord = cardName;
+
+    if (urlMatched(/yugioh-wiki.net/)) {
+      googleSearchWord = replacedCardName;
     }
-    else {
-      googleSearchWord = cardName;
+
+    if (document.getElementById('add_search_word_yugioh').checked) {
+      googleSearchWord += '\+遊戯王';
     }
 
     googleSearchLink.href = `https://www.google.com/search?q=${googleSearchWord}`;

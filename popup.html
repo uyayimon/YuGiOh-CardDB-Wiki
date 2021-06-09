@@ -1,57 +1,68 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      width: max-content;
-      max-width: 220px;
-    }
-    a {
-      font-size: 1.3em;
-      width: 100%;
-    }
-    a:hover {
-      color: red;
-    }
-    div {
-      padding: 1px 0;
-    }
-    .no_mgn {
-      margin: 0;
-    }
-
-    @-moz-document url-prefix(){
+  <head>
+    <meta charset="UTF-8" />
+    <style>
       body {
-        max-width: 275px;
+        width: max-content;
+        max-width: 230px;
       }
       a {
-        font-size: 1em;
+        font-size: 1.3em;
+        width: 100%;
       }
-      #card_name {
-        font-size: 0.8em;
+      a:hover {
+        color: red;
       }
-    }
-  </style>
-</head>
-<body>
-  <p class="no_mgn" id="card_name"></p>
-  <hr>
+      div {
+        padding: 1px 0;
+      }
+      .no_mgn {
+        margin: 0;
+      }
 
-  <a id="site_link" href="#" target="_blank" rel="noopener noreferrer">
+      @-moz-document url-prefix() {
+        body {
+          max-width: 275px;
+        }
+        a {
+          font-size: 1em;
+        }
+        #card_name {
+          font-size: 0.8em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <p class="no_mgn" id="card_name"></p>
+    <hr />
+
+    <a id="site_link" href="#" target="_blank" rel="noopener noreferrer">
+      <div>
+        <p id="site_link_text"></p>
+      </div>
+    </a>
+    <hr />
+
     <div>
-      <p id="site_link_text"></p>
+      <a
+        id="google_search_link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        ><p class="no_mgn">カード名をGoogle検索</p></a
+      >
+      <label
+        ><input
+          id="add_search_word_yugioh"
+          type="checkbox"
+        />検索ワードに「遊戯王」を含める</label
+      >
     </div>
-  </a>
-  <hr>
 
-  <div>
-    <a id="google_search_link" href="#" target="_blank" rel="noopener noreferrer"><p class="no_mgn">カード名をGoogle検索</p></a>
-    <label><input id="search_word" type="checkbox">検索ワードに「遊戯王」を含める</label>
-  </div>
-
-  <script src="PDC_list_json.js"></script>
-  <script src="encoding.js"></script>
-  <script src="popup.js"></script>
-</body>
+    <script src="PDC_list_json.js"></script>
+    <script src="encoding.js"></script>
+    <script src="popup.js"></script>
+  </body>
 </html>
