@@ -30,36 +30,46 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   let cardName;
   let replacedCardName;
 
-  const urlMatched = (urlPartial) => {
-    return tab[0].url.match(urlPartial);
+  const urlIncludes = (urlPartial) => {
+    return tab[0].url.includes(urlPartial);
   }
 
-  if (urlMatched(/www.db.yugioh-card.com/)) {
-    const barPosition = pageName.indexOf(' | ');
-    cardName = pageName.substr(0, barPosition);
+  const replacePDC = (writing1, writing2) => {
+    const foundCardName = platformDependentCharCardList.find(( pdcKey ) => pdcKey[writing1] == cardName);
 
-    // 機種依存文字を含まない名前に変換
-    const foundCardName = platformDependentCharCardList.find(({ official_name }) => official_name == cardName);
     if (foundCardName != undefined) {
-      replacedCardName = foundCardName.Wiki_name;
+      replacedCardName = foundCardName[writing2];
     }
     else {
       replacedCardName = cardName;
     }
+  }
+
+
+  if (urlIncludes('www.db.yugioh-card.com')) {
+    const barPosition = pageName.indexOf(' | ');
+    cardName = pageName.substr(0, barPosition);
+
+    // 機種依存文字を含まない名前に変換
+    replacePDC('official_name', 'wiki_name');
 
     // ローマ数字→アルファベット
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(key).join(value);
     }
 
-    replacedCardName = replacedCardName.replace(/-/g, '－');
-
     // 半角→全角
+    replacedCardName = replacedCardName.replace(/-/g, '－');
     replacedCardName = replacedCardName.replace(/[A-Za-z0-9]/g, (s) => {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
     });
 
-    if (urlMatched(/yugiohdb/)) {
+    if (urlIncludes('rushdb')) {
+      siteLinkText.innerText = 'ラッシュデュエルWikiで表示';
+      siteLink.href = `https://yugioh-wiki.net/rush/index.php?《${replacedCardName}》`;
+    }
+
+    else if (urlIncludes('yugiohdb')) {
       // エンコード
       const keywordArray = [];
       for (let i = 0; i < replacedCardName.length; i++) {
@@ -71,33 +81,22 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       siteLinkText.innerText = '遊戯王カードWikiで表示';
       siteLink.href = `https://yugioh-wiki.net/index.php?%A1%D4${encodedKeyword}%A1%D5`;
     }
-
-    else if (urlMatched(/rushdb/)) {
-      siteLinkText.innerText = 'ラッシュデュエルWikiで表示';
-      siteLink.href = `https://yugioh-wiki.net/rush/index.php?《${replacedCardName}》`;
-    }
   }
 
-  if (urlMatched(/yugioh-wiki.net/)) {
+  if (urlIncludes('yugioh-wiki.net')) {
     const leftBracket = pageName.indexOf('《');
     const rightBracket = pageName.indexOf('》');
     cardName = pageName.substring((leftBracket + 1), (rightBracket));
 
     // 機種依存文字を含む名前に変換
-    const foundCardName = platformDependentCharCardList.find(({ Wiki_name }) => Wiki_name == cardName);
-    if (foundCardName != undefined) {
-      replacedCardName = foundCardName.official_name;
-    }
-    else {
-      replacedCardName = cardName;
-    }
+    replacePDC('wiki_name', 'official_name');
 
     // アルファベット→ローマ数字
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(value).join(key);
     }
 
-    if (urlMatched(/rush/)) {
+    if (urlIncludes('rush')) {
       siteLinkText.innerText = 'ラッシュデュエルデータベースで検索';
       siteLink.href = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=20&keyword=${replacedCardName}`;
     }
@@ -113,7 +112,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   googleSearchLink.addEventListener('click', () => {
     let googleSearchWord = cardName;
 
-    if (urlMatched(/yugioh-wiki.net/)) {
+    if (urlIncludes('yugioh-wiki.net')) {
       googleSearchWord = replacedCardName;
     }
 
