@@ -1,0 +1,54 @@
+html {
+  background: #333;
+}
+body {
+  width: 260px;
+  background: #fff;
+  padding: 10px;
+}
+a {
+  font-size: 1.3em;
+  text-decoration: none;
+}
+a:hover, a.link:hover>.link_text, #site_link_text:hover {
+  opacity: 0.8;
+}
+.link_text {
+  text-align: center;
+  border: 1px grey solid;
+  padding: 15px 5px;
+  margin-bottom: 15px;
+}
+.google_search {
+  color: #333;
+  margin: 5px auto;
+  background: antiquewhite;
+}
+#google_link_yugioh_text {
+  padding: 5px;
+}
+#to_about_text {
+  text-align: right;
+  font-size: 0.8em;
+}
+.to_db {
+  background: #555;
+  color: #fff;
+}
+.to_wiki {
+  background: #DDEEFF;
+  color: #000;
+}
+.no_mgn {
+  margin: 0;
+}
+
+@-moz-document url-prefix() {
+  a {
+    font-size: 1em;
+  }
+  #card_name,
+  #add_word_lbl {
+    font-size: 0.8em;
+  }
+}

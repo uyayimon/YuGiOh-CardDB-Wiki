@@ -1,27 +1,35 @@
 {
-  "name":"遊戯王DB⇔Wiki",
-  "version":"1.0",
-  "manifest_version":2,
-  "description": "遊戯王公式データベースと遊戯王カードWikiの、カードの詳細ページを相互に行き来できる拡張機能です。ラッシュデュエルにも対応しています。",
+  "name": "遊戯王DB⇔Wiki",
+  "version": "1.0.1",
+  "manifest_version": 2,
+  "description": "遊戯王公式カードデータベースと遊戯王カードWikiのカード詳細ページを相互に行き来できる拡張機能です。ラッシュデュエルにも対応しています。",
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png"
+    "16": "icons/icon-16x16.png",
+    "48": "icons/icon-48x48.png",
+    "96": "icons/icon-96x96.png",
+    "128": "icons/icon-128x128.png"
   },
 
-  "permissions":[
-    "tabs"
-  ],
+  "permissions": ["tabs"],
 
-  "background":{
-    "scripts":[
-      "background.js"
-    ],
+  "background": {
+    "scripts": ["background.js"],
     "persistent": false
   },
 
-  "page_action":{
+  "page_action": {
     "default_title": "遊戯王DB⇔Wiki",
-    "default_popup":"popup.html"
-  }
+    "default_popup": "popup.html"
+  },
 
+  "commands": {
+    "_execute_page_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Left",
+        "mac": "MacCtrl+Shift+Left"
+      }
+    }
+  },
+
+  "homepage_url": "https://github.com/uyayimon/YuGiOh-CardDB-Wiki/wiki"
 }

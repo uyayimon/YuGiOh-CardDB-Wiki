@@ -2,6 +2,7 @@
 
 // encoding.js
 // Copyright (c) 2014-2019 Polygon Planet
+// https://github.com/polygonplanet/encoding.js
 // MIT License
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
@@ -24,7 +25,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
   const siteLink = document.getElementById('site_link');
   const siteLinkText = document.getElementById('site_link_text');
-  const googleSearchLink = document.getElementById('google_search_link');
 
   const pageName = tab[0].title;
   let cardName;
@@ -65,11 +65,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     });
 
     if (urlIncludes('rushdb')) {
-      siteLinkText.innerText = 'ラッシュデュエルWikiで表示';
+      siteLinkText.innerText = '《ラッシュデュエルWikiで表示》';
+      siteLinkText.classList.add('to_wiki');
       siteLink.href = `https://yugioh-wiki.net/rush/index.php?《${replacedCardName}》`;
     }
 
-    else if (urlIncludes('yugiohdb')) {
+    else {
       // エンコード
       const keywordArray = [];
       for (let i = 0; i < replacedCardName.length; i++) {
@@ -78,7 +79,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       const eucjpArray = Encoding.convert(keywordArray, 'EUCJP', 'AUTO');
       const encodedKeyword = Encoding.urlEncode(eucjpArray);
 
-      siteLinkText.innerText = '遊戯王カードWikiで表示';
+      siteLinkText.innerText = '《遊戯王カードWikiで表示》';
+      siteLinkText.classList.add('to_wiki');
       siteLink.href = `https://yugioh-wiki.net/index.php?%A1%D4${encodedKeyword}%A1%D5`;
     }
   }
@@ -97,29 +99,31 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     }
 
     if (urlIncludes('rush')) {
-      siteLinkText.innerText = 'ラッシュデュエルデータベースで検索';
-      siteLink.href = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=20&keyword=${replacedCardName}`;
+      siteLinkText.innerText = 'ラッシュデュエル\nデータベースで検索';
+      siteLinkText.classList.add('to_db');
+      siteLink.href = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${replacedCardName}`;
     }
     else {
       siteLinkText.innerText = '遊戯王OCGデータベースで検索';
-      siteLink.href = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&keyword=${replacedCardName}`;
+      siteLinkText.classList.add('to_db');
+      siteLink.href = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${replacedCardName}`;
     }
   }
 
   document.getElementById('card_name').innerText = cardName;
 
+  siteLink.focus();
 
-  googleSearchLink.addEventListener('click', () => {
-    let googleSearchWord = cardName;
 
-    if (urlIncludes('yugioh-wiki.net')) {
-      googleSearchWord = replacedCardName;
-    }
+  const googleSearchLink = document.getElementById('google_search_link');
+  const googleSearchLinkYugioh = document.getElementById('google_search_link_yugioh');
 
-    if (document.getElementById('add_search_word_yugioh').checked) {
-      googleSearchWord += '\+遊戯王';
-    }
+  googleSearchWord = cardName;
 
-    googleSearchLink.href = `https://www.google.com/search?q=${googleSearchWord}`;
-  });
+  if (urlIncludes('yugioh-wiki.net')) {
+    googleSearchWord = replacedCardName;
+  }
+
+  googleSearchLink.href = `https://www.google.com/search?q=${googleSearchWord}`;
+  googleSearchLinkYugioh.href = `https://www.google.com/search?q=${googleSearchWord}\+遊戯王`;
 });
