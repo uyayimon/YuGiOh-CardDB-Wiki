@@ -26,12 +26,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   const siteLink = document.getElementById('site_link');
   const siteLinkText = document.getElementById('site_link_text');
 
+  const currentUrl = tab[0].url;
   const pageName = tab[0].title;
   let cardName;
   let replacedCardName;
 
   const urlIncludes = (urlPartial) => {
-    return tab[0].url.includes(urlPartial);
+    return currentUrl.includes(urlPartial);
   }
 
   const replacePDC = (writing1, writing2) => {

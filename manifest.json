@@ -6,11 +6,25 @@
   "icons": {
     "16": "icons/icon-16x16.png",
     "48": "icons/icon-48x48.png",
+    "64": "icons/icon-64x64.png",
     "96": "icons/icon-96x96.png",
     "128": "icons/icon-128x128.png"
   },
 
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.db.yugioh-card.com/*/*cid*",
+        "https://yugioh-wiki.net/*%A1%D4%*",
+        "https://rush.yugioh-wiki.net/*%E3%80%8A*",
+        "https://yugioh-wiki.net/rush/*%E3%80%8A*"
+      ],
+      "js": ["encoding.js", "PDC_list.js", "navigation.js"],
+      "css": ["navigation.css"]
+    }
+  ],
 
   "background": {
     "scripts": ["background.js"],
@@ -30,6 +44,8 @@
       }
     }
   },
+
+  "web_accessible_resources": ["icons/iconDW.png"],
 
   "homepage_url": "https://github.com/uyayimon/YuGiOh-CardDB-Wiki/wiki"
 }
