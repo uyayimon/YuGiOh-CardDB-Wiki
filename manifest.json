@@ -21,13 +21,13 @@
         "https://rush.yugioh-wiki.net/*%E3%80%8A*",
         "https://yugioh-wiki.net/rush/*%E3%80%8A*"
       ],
-      "js": ["encoding.js", "PDC_list.js", "navigation.js"],
-      "css": ["navigation.css"]
+      "js": ["content_scripts/nav-icon.js"],
+      "css": ["content_scripts/nav-icon.css"]
     }
   ],
 
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["js/encoding.js", "js/PDC_list.js", "background.js"],
     "persistent": false
   },
 
@@ -37,12 +37,18 @@
   },
 
   "commands": {
-    "_execute_page_action": {
+    "key_page_navigation": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Left",
-        "mac": "MacCtrl+Shift+Left"
-      }
+        "default": "Ctrl+Shift+Y",
+        "mac": "MacCtrl+Shift+Y"
+      },
+      "description": "データベース・Wikiへの移動"
     }
+  },
+
+  "options_ui": {
+    "page": "options/options.html",
+    "chrome_style": true
   },
 
   "web_accessible_resources": ["icons/iconDW.png"],
