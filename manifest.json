@@ -19,7 +19,7 @@
         "https://www.db.yugioh-card.com/*/*cid*",
         "https://yugioh-wiki.net/*%A1%D4%*",
         "https://rush.yugioh-wiki.net/*%E3%80%8A*",
-        "https://yugioh-wiki.net/rush/*%E3%80%8A*"
+        "https://yugioh-wiki.net/*%E3%80%8A*"
       ],
       "js": ["content_scripts/nav-icon.js"],
       "css": ["content_scripts/nav-icon.css"]
@@ -33,7 +33,7 @@
 
   "page_action": {
     "default_title": "遊戯王DB⇔Wiki",
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
 
   "commands": {
@@ -42,7 +42,14 @@
         "default": "Ctrl+Shift+Y",
         "mac": "MacCtrl+Shift+Y"
       },
-      "description": "データベース・Wikiへの移動"
+      "description": "データベース⇔Wikiの移動"
+    },
+    "key_google_search": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "MacCtrl+Shift+G"
+      },
+      "description": "カード名をGoogle検索"
     }
   },
 
@@ -51,7 +58,7 @@
     "chrome_style": true
   },
 
-  "web_accessible_resources": ["icons/iconDW.png"],
+  "web_accessible_resources": ["icons/iconDW-128x128.png"],
 
   "homepage_url": "https://github.com/uyayimon/YuGiOh-CardDB-Wiki/wiki"
 }

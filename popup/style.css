@@ -6,6 +6,10 @@ body {
   background: #fff;
   padding: 10px;
 }
+label {
+  user-select: none;
+  cursor: pointer;
+}
 a {
   font-size: 1.3em;
   text-decoration: none;

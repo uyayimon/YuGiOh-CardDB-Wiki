@@ -6,20 +6,22 @@
 // MIT License
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
+const queryinfo = { active: true, currentWindow: true }
+
+const urlIncludesParts = (target, ...urlPartial) =>
+  urlPartial.every(element => target.includes(element));
+
+const discernUrl = (target) => {
+  if (urlIncludesParts(target, 'www.db.yugioh-card.com', 'cid=') ||
+    urlIncludesParts(target, 'yugioh-wiki.net', '%A1%D4') ||
+    urlIncludesParts(target, 'yugioh-wiki.net', '%E3%80%8A')) {
+    return true;
+  }
+}
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-
-  const urlIncludes = (element) => tab.url.includes(element);
-  const urlIncludesParts = (...urlPartial) => {
-    return urlPartial.every(urlIncludes);
-  }
-
-  if (urlIncludesParts('www.db.yugioh-card.com', 'cid=') ||
-    urlIncludesParts('yugioh-wiki.net', '%A1%D4') ||
-    urlIncludesParts('yugioh-wiki.net', '%E3%80%8A')) {
-
+  if (discernUrl(tab.url))
     chrome.pageAction.show(tabId);
-  }
 });
 
 
@@ -42,22 +44,16 @@ const getCardName = (currentPageName, currentPageUrl) => {
   let replacedCardName;
   let navPageUrl;
 
-  const urlIncludes = (urlPartial) => {
-    return currentPageUrl.includes(urlPartial);
-  }
-
   const replacePDC = (writing1, writing2) => {
     const foundCardName = platformDependentCharCardList.find((pdcKey) => pdcKey[writing1] == cardName);
 
-    if (foundCardName != undefined) {
+    if (foundCardName != undefined)
       replacedCardName = foundCardName[writing2];
-    }
-    else {
+    else
       replacedCardName = cardName;
-    }
   }
 
-  if (urlIncludes('www.db.yugioh-card.com')) {
+  if (urlIncludesParts(currentPageUrl, 'www.db.yugioh-card.com')) {
     const barPosition = currentPageName.indexOf(' | ');
     cardName = currentPageName.substr(0, barPosition);
 
@@ -75,9 +71,8 @@ const getCardName = (currentPageName, currentPageUrl) => {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
     });
 
-    if (urlIncludes('rushdb')) {
-      navPageUrl = `https://yugioh-wiki.net/rush/index.php?《${replacedCardName}》`;
-    }
+    if (urlIncludesParts(currentPageUrl, 'rushdb'))
+      navPageUrl = `https://rush.yugioh-wiki.net/index.php?《${replacedCardName}》`;
 
     else {
       // エンコード
@@ -92,7 +87,7 @@ const getCardName = (currentPageName, currentPageUrl) => {
     }
   }
 
-  if (urlIncludes('yugioh-wiki.net')) {
+  if (urlIncludesParts(currentPageUrl, 'yugioh-wiki.net')) {
     const leftBracket = currentPageName.indexOf('《');
     const rightBracket = currentPageName.indexOf('》');
     cardName = currentPageName.substring((leftBracket + 1), (rightBracket));
@@ -105,30 +100,39 @@ const getCardName = (currentPageName, currentPageUrl) => {
       replacedCardName = replacedCardName.split(value).join(key);
     }
 
-    if (urlIncludes('rush')) {
+    if (urlIncludesParts(currentPageUrl, 'rush'))
       navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${replacedCardName}`;
-    }
-    else {
-      utfCardName = encodeURI(replacedCardName);
-      navPageUrl = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${utfCardName}`;
-    }
+    else
+      navPageUrl = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${encodeURI(replacedCardName)}`;
   }
-  return { name1: cardName, name2: replacedCardName, link: navPageUrl };
+
+  return {
+    name1: cardName,
+    name2: replacedCardName,
+    link: navPageUrl
+  }
 }
 
 
 const navigatePageDW = (adress) => {
-  window.open(adress);
+  chrome.tabs.query(queryinfo, (tab) => {
+    chrome.tabs.create({
+      url: adress,
+      index: tab[0].index + 1
+    });
+  });
 }
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // from nav-icon.js
   if (request.message == 'page_navigation') {
-    const result = getCardName(sender.tab.title, sender.tab.url)
+    const result = getCardName(sender.tab.title, sender.tab.url);
     navigatePageDW(result.link);
   }
-  if (request.message == 'get_name') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+  // from popup.js
+  if (request.message == 'get_name&url') {
+    chrome.tabs.query(queryinfo, (tab) => {
       const result = getCardName(tab[0].title, tab[0].url)
       sendResponse(result);
     });
@@ -138,10 +142,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 chrome.commands.onCommand.addListener((command) => {
-  if (command == 'key_page_navigation') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+  chrome.tabs.query(queryinfo, (tab) => {
+    if (!discernUrl(tab[0].url)) return;
+    else {
       const result = getCardName(tab[0].title, tab[0].url)
-      navigatePageDW(result.link);
-    });
-  }
+
+      if (command == 'key_page_navigation')
+        navigatePageDW(result.link);
+
+      if (command == 'key_google_search')
+        navigatePageDW(`https://www.google.com/search?q=${result.name1}`);
+    }
+  });
 });

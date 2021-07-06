@@ -1,21 +1,62 @@
+const currentUrl = location.href;
+
+const urlIncludes = (urlPartial) => {
+  return currentUrl.includes(urlPartial);
+}
+
+const getTooltipText = () => {
+  let navText;
+  let navClass;
+
+  if (urlIncludes('www.db.yugioh-card.com')) {
+    navText = '《カードWikiで表示》';
+    navClass = 'to_wiki';
+  }
+
+  else if (urlIncludes('yugioh-wiki.net')) {
+    navText = '公式データベースで検索';
+    navClass = 'to_db';
+  }
+
+  return {
+    text: navText,
+    class: navClass
+  }
+}
+
 const displayNavIvon = () => {
   // 要素の生成
   const newElement = document.createElement('div');
-  newElement.setAttribute('id', 'navigation_icon');
-
-  const img_element = document.createElement('img');
-  const iconURL = chrome.extension.getURL('icons/iconDW.png');
-  img_element.src = iconURL;
-  newElement.appendChild(img_element);
+  newElement.setAttribute('id', 'icon_whole');
 
   const p1 = document.createElement('p');
-  const text1 = document.createTextNode('×');
+  const text_x = document.createTextNode('×');
   newElement.appendChild(p1);
-  p1.appendChild(text1);
-  p1.setAttribute('id', 'close');
+  p1.appendChild(text_x);
+  p1.setAttribute('id', 'close_btn');
+
+  const img_element = document.createElement('img');
+  const iconURL = chrome.extension.getURL('icons/iconDW-128x128.png');
+  img_element.src = iconURL;
+  img_element.setAttribute('id', 'icon_navigate');
+
+  chrome.storage.sync.get({ setting_nav_icon_size: 48 }, (items) => {
+    const size_value = items.setting_nav_icon_size + 'px';
+    img_element.style.width = size_value;
+    img_element.style.height = size_value;
+  });
+
+  newElement.appendChild(img_element);
+
+  const tooltip = document.createElement('span');
+  const tooltipText1 = document.createTextNode(getTooltipText().text);
+  newElement.appendChild(tooltip);
+  tooltip.appendChild(tooltipText1);
+  tooltip.setAttribute('id', 'tooltip_text');
+  tooltip.setAttribute('class', getTooltipText().class);
 
   document.body.appendChild(newElement);
-  const navIcon = document.getElementById('navigation_icon');
+  const navIcon = document.getElementById('icon_whole');
 
   chrome.storage.sync.get({ icon_position_y: '200px', icon_position_x: '90%' }, (items) => {
     const positionTop = items.icon_position_y;
@@ -24,6 +65,7 @@ const displayNavIvon = () => {
     navIcon.style.top = positionTop;
     navIcon.style.left = positionLeft;
   });
+
 
   navIcon.ondragstart = (event) => {
     return false;
@@ -62,30 +104,53 @@ const displayNavIvon = () => {
         icon_position_x: (iconX / window_w) * 100 + '%'
       }
     );
-
-    if (iconMoved) return;
-
-    chrome.runtime.sendMessage({ message: "page_navigation" });
   }
+
+
+  document.getElementById('icon_navigate').addEventListener('click', () => {
+    if (iconMoved) return;
+    else
+      // to background.js
+      chrome.runtime.sendMessage({ message: "page_navigation" });
+  });
+
+  document.getElementById('close_btn').addEventListener('click', (event) => {
+    event.stopPropagation();
+    removeNavIcon();
+  });
+
 }
 
 const removeNavIcon = () => {
-  const navIcon = document.getElementById('navigation_icon');
+  const navIcon = document.getElementById('icon_whole');
   document.body.removeChild(navIcon);
 }
 
+
 chrome.storage.sync.get({
-  setting_nav_icon: true
+  setting_nav_icon_display: true
 
 }, (items) => {
-  if (!items.setting_nav_icon) return;
+  if (!items.setting_nav_icon_display) return;
 
-  else {
-    displayNavIvon();
+  else displayNavIvon();
+});
 
-    document.getElementById('close').addEventListener('mouseup', (event) => {
-      event.stopPropagation();
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // from popup.js
+  if (request.message == 'presence')
+    sendResponse(!!document.getElementById("icon_whole"));
+
+  // from popup.js
+  if (request.message == 'display_icon') {
+    if (request.checked) {
+      if (!document.getElementById("icon_whole"))
+        displayNavIvon();
+    }
+    else
       removeNavIcon();
-    });
   }
+
+  return true;
 });

@@ -11,42 +11,61 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     return currentUrl.includes(urlPartial);
   }
 
-  chrome.runtime.sendMessage({ message: 'get_name' }, (response) => {
+  // to background.js
+  chrome.runtime.sendMessage({ message: 'get_name&url' }, (response) => {
     const name1 = response.name1;
     const name2 = response.name2;
-    const link = response.link
 
-    siteLink.href = link;
+    siteLink.href = response.link;
 
     if (urlIncludes('www.db.yugioh-card.com')) {
       if (urlIncludes('rushdb')) {
         siteLinkText.innerText = '《ラッシュデュエルWikiで表示》';
-        siteLinkText.classList.add('to_wiki');
       }
       else {
         siteLinkText.innerText = '《遊戯王カードWikiで表示》';
-        siteLinkText.classList.add('to_wiki');
       }
 
+      siteLinkText.classList.add('to_wiki');
       document.getElementById('card_name').innerText = name1
     }
 
 
-    if (urlIncludes('yugioh-wiki.net')) {
+    else if (urlIncludes('yugioh-wiki.net')) {
       if (urlIncludes('rush')) {
         siteLinkText.innerText = 'ラッシュデュエル\nデータベースで検索';
-        siteLinkText.classList.add('to_db');
       }
       else {
         siteLinkText.innerText = '遊戯王OCGデータベースで検索';
-        siteLinkText.classList.add('to_db');
       }
 
+      siteLinkText.classList.add('to_db');
       document.getElementById('card_name').innerText = name2
     }
 
 
     googleSearchLink.href = `https://www.google.com/search?q=${name2}`;
     googleSearchLinkYugioh.href = `https://www.google.com/search?q=${name2}\+遊戯王`;
+  });
+
+
+  const displayNavIcon = document.getElementById('display_nav_icon');
+
+  // to nav-icon.js
+  chrome.tabs.sendMessage(tab[0].id, { message: 'presence' }, (response) => {
+    displayNavIcon.checked = response;
+  });
+
+  displayNavIcon.addEventListener('change', () => {
+    // to nav-icon.js
+    chrome.tabs.sendMessage(tab[0].id, {
+      message: 'display_icon',
+      checked: displayNavIcon.checked
+    });
+
+    chrome.storage.sync.set({
+      setting_nav_icon_display: displayNavIcon.checked
+    });
+
   });
 });
