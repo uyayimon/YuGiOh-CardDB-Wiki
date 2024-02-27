@@ -6,6 +6,7 @@
 // MIT License
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
+
 const queryinfo = { active: true, currentWindow: true }
 
 const urlIncludesParts = (target, ...urlPartial) =>

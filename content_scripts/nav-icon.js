@@ -24,7 +24,7 @@ const getTooltipText = () => {
   }
 }
 
-const displayNavIvon = () => {
+const displayNavIcon = () => {
   // 要素の生成
   const newElement = document.createElement('div');
   newElement.setAttribute('id', 'icon_whole');
@@ -36,7 +36,7 @@ const displayNavIvon = () => {
   p1.setAttribute('id', 'close_btn');
 
   const img_element = document.createElement('img');
-  const iconURL = chrome.extension.getURL('icons/iconDW-128x128.png');
+  const iconURL = chrome.runtime.getURL('icons/iconDW-128x128.png');
   img_element.src = iconURL;
   img_element.setAttribute('id', 'icon_navigate');
 
@@ -58,14 +58,17 @@ const displayNavIvon = () => {
   document.body.appendChild(newElement);
   const navIcon = document.getElementById('icon_whole');
 
-  chrome.storage.sync.get({ icon_position_y: '200px', icon_position_x: '90%' }, (items) => {
-    const positionTop = items.icon_position_y;
-    const positionLeft = items.icon_position_x;
+  const setIconPosition = () => {
+    chrome.storage.sync.get({ icon_position_y: '200px', icon_position_x: '90%' }, (items) => {
+      const positionTop = items.icon_position_y;
+      const positionLeft = items.icon_position_x;
 
-    navIcon.style.top = positionTop;
-    navIcon.style.left = positionLeft;
-  });
+      navIcon.style.top = positionTop;
+      navIcon.style.left = positionLeft;
+    });
+  }
 
+  setIconPosition();
 
   navIcon.ondragstart = (event) => {
     return false;
@@ -107,6 +110,8 @@ const displayNavIvon = () => {
   }
 
 
+  window.addEventListener('resize', setIconPosition);
+
   document.getElementById('icon_navigate').addEventListener('click', () => {
     if (iconMoved) return;
     else
@@ -133,7 +138,7 @@ chrome.storage.sync.get({
 }, (items) => {
   if (!items.setting_nav_icon_display) return;
 
-  else displayNavIvon();
+  else displayNavIcon();
 });
 
 
@@ -143,10 +148,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse(!!document.getElementById("icon_whole"));
 
   // from popup.js
-  if (request.message == 'display_icon') {
+  else if (request.message == 'display_icon') {
     if (request.checked) {
       if (!document.getElementById("icon_whole"))
-        displayNavIvon();
+        displayNavIcon();
     }
     else
       removeNavIcon();

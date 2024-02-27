@@ -1,6 +1,6 @@
 {
   "name": "遊戯王DB⇔Wiki",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "manifest_version": 2,
   "description": "遊戯王公式カードデータベースと遊戯王カードWikiのカード詳細ページを相互に行き来できる拡張機能です。ラッシュデュエルにも対応しています。",
   "icons": {

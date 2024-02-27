@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ナビゲーションアイコンの表示サイズ
       slider.value = items.setting_nav_icon_size;
-      editSize.innerHTML = slider.value;
+      editSize.innerText = slider.value;
     });
 
   size = slider.value;
