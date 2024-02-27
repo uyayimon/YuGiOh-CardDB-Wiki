@@ -1,7 +1,7 @@
 {
+  "manifest_version": 3,
   "name": "遊戯王DB⇔Wiki",
   "version": "1.0.2",
-  "manifest_version": 2,
   "description": "遊戯王公式カードデータベースと遊戯王カードWikiのカード詳細ページを相互に行き来できる拡張機能です。ラッシュデュエルにも対応しています。",
   "icons": {
     "16": "icons/icon-16x16.png",
@@ -10,9 +10,20 @@
     "96": "icons/icon-96x96.png",
     "128": "icons/icon-128x128.png"
   },
-
-  "permissions": ["tabs", "storage"],
-
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting",
+    "webRequest",
+    "declarativeNetRequest"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "遊戯王DB⇔Wiki"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -25,17 +36,6 @@
       "css": ["content_scripts/nav-icon.css"]
     }
   ],
-
-  "background": {
-    "scripts": ["js/encoding.js", "js/PDC_list.js", "background.js"],
-    "persistent": false
-  },
-
-  "page_action": {
-    "default_title": "遊戯王DB⇔Wiki",
-    "default_popup": "popup/popup.html"
-  },
-
   "commands": {
     "key_page_navigation": {
       "suggested_key": {
@@ -52,13 +52,14 @@
       "description": "カード名をGoogle検索"
     }
   },
-
   "options_ui": {
-    "page": "options/options.html",
-    "chrome_style": true
+    "page": "options/options.html"
   },
-
-  "web_accessible_resources": ["icons/iconDW-128x128.png"],
-
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/iconDW-128x128.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "homepage_url": "https://github.com/uyayimon/YuGiOh-CardDB-Wiki/wiki"
 }
