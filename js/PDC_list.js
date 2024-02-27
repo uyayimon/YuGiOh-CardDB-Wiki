@@ -1,5 +1,5 @@
 // 機種依存文字の対応
-const platformDependentCharCardList = [
+export const interconversionCardList = [
   {
     official_name: "黄紡鮄デュオニギス",
     wiki_name: "黄紡ぼうデュオニギス"

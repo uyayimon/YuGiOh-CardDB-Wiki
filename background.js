@@ -1,3 +1,4 @@
+import "./js/encoding.js"
 // Encoding.convert() and Encoding.urlEncode() are functions by
 
 // encoding.js
@@ -5,6 +6,9 @@
 // https://github.com/polygonplanet/encoding.js
 // MIT License
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
+
+
+import { interconversionCardList } from "./js/PDC_list.js"
 
 
 const queryinfo = { active: true, currentWindow: true }
@@ -22,7 +26,7 @@ const discernUrl = (target) => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (discernUrl(tab.url))
-    chrome.pageAction.show(tabId);
+    chrome.action.show(tabId);
 });
 
 
@@ -46,7 +50,7 @@ const getCardName = (currentPageName, currentPageUrl) => {
   let navPageUrl;
 
   const replacePDC = (writing1, writing2) => {
-    const foundCardName = platformDependentCharCardList.find((pdcKey) => pdcKey[writing1] == cardName);
+    const foundCardName = interconversionCardList.find((pdcKey) => pdcKey[writing1] == cardName);
 
     if (foundCardName != undefined)
       replacedCardName = foundCardName[writing2];
