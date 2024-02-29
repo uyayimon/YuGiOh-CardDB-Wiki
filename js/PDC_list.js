@@ -13,6 +13,10 @@ export const interconversionCardList = [
     wiki_name: "Ｓ－Ｆｏｒｃｅ プロフェッサー・ディガンマ"
   },
   {
+    official_name: "ユベル－Das Ewig Liebe Wächter",
+    wiki_name: "ユベル－Ｄａｓ Ｅｗｉｇ Ｌｉｅｂｅ Ｗａｃｈｔｅｒ"
+  },
+  {
     official_name: "機巧辰－高闇御津羽靇",
     wiki_name: "機巧辰－高闇御津羽オカミ"
   },
@@ -61,12 +65,20 @@ export const interconversionCardList = [
     wiki_name: "炎舞－「天キ」"
   },
   {
+    official_name: "Nouvellez Auberge 『À Table』",
+    wiki_name: "Ｎｏｕｖｅｌｌｅｚ Ａｕｂｅｒｇｅ 『Ａ Ｔａｂｌｅ』"
+  },
+  {
     official_name: "魔界台本「魔界の宴咜女」",
     wiki_name: "魔界台本「魔界の宴タ女」"
   },
   {
     official_name: "炎舞－「天璇」",
     wiki_name: "炎舞－「天セン」"
+  },
+  {
+    official_name: "Recette de Spécialité～料理長自慢のレシピ～",
+    wiki_name: "Ｒｅｃｅｔｔｅ ｄｅ Ｓｐｅｃｉａｌｉｔｅ～料理長自慢のレシピ～"
   },
   {
     official_name: "白棘鱏",
@@ -83,5 +95,30 @@ export const interconversionCardList = [
   {
     official_name: "星墜つる地に立つ閃珖",
     wiki_name: "スターダスト・リ・スパーク"
+  },
+  {
+    official_name: "軍貫処 『海せん』",
+    wiki_name: "軍貫処『海せん』"
   }
 ]
+
+
+// ローマ数字の変換
+export const romanNumeralList = {
+  "Ⅹ": "Ｘ",
+  "Ⅸ": "ＩⅩ",
+  "Ⅷ": "ＶＩＩＩ",
+  "Ⅶ": "ＶＩＩ",
+  "Ⅵ": "ＶＩ",
+  "Ⅳ": "ＩＶ",
+  "Ⅴ": "Ｖ",
+  "Ⅲ": "ＩＩＩ",
+  "Ⅱ": "ＩＩ",
+  "Ⅰ": "Ｉ"
+}
+
+
+// 文字の変換
+export const interconversionCharacterList = {
+  "～": " "
+}

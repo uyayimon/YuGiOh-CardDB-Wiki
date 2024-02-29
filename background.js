@@ -8,8 +8,7 @@ import "./js/encoding.js"
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
 
-import { interconversionCardList } from "./js/PDC_list.js"
-
+import { interconversionCardList, romanNumeralList, interconversionCharacterList } from "./js/PDC_list.js"
 
 const queryinfo = { active: true, currentWindow: true }
 
@@ -31,20 +30,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 
 const getCardName = (currentPageName, currentPageUrl) => {
-  // ローマ数字の変換リスト
-  const romanNumeralList = {
-    "Ⅹ": "Ｘ",
-    "Ⅸ": "ＩⅩ",
-    "Ⅷ": "ＶＩＩＩ",
-    "Ⅶ": "ＶＩＩ",
-    "Ⅵ": "ＶＩ",
-    "Ⅳ": "ＩＶ",
-    "Ⅴ": "Ｖ",
-    "Ⅲ": "ＩＩＩ",
-    "Ⅱ": "ＩＩ",
-    "Ⅰ": "Ｉ"
-  }
-
   let cardName;
   let replacedCardName;
   let navPageUrl;
@@ -103,6 +88,11 @@ const getCardName = (currentPageName, currentPageUrl) => {
     // アルファベット→ローマ数字
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(value).join(key);
+    }
+
+    // その他、DB検索において認識されない文字を変換
+    for (const [key, value] of Object.entries(interconversionCharacterList)) {
+      replacedCardName = replacedCardName.split(key).join(value);
     }
 
     if (urlIncludesParts(currentPageUrl, 'rush'))
