@@ -96,17 +96,23 @@ export const interconversionCardList = [
     official_name: "星墜つる地に立つ閃珖",
     wiki_name: "スターダスト・リ・スパーク"
   },
+
+
   {
     official_name: "軍貫処 『海せん』",
     wiki_name: "軍貫処『海せん』"
+  },
+  {
+    official_name: "俱利伽羅天童",
+    wiki_name: "倶利伽羅天童"
   }
 ]
 
 
-// ローマ数字の変換
+// ローマ数字の変換（Wiki向け）
 export const romanNumeralList = {
   "Ⅹ": "Ｘ",
-  "Ⅸ": "ＩⅩ",
+  "Ⅸ": "ＩＸ",
   "Ⅷ": "ＶＩＩＩ",
   "Ⅶ": "ＶＩＩ",
   "Ⅵ": "ＶＩ",
@@ -118,7 +124,10 @@ export const romanNumeralList = {
 }
 
 
-// 文字の変換
+// 文字の変換（DB検索対策）
 export const interconversionCharacterList = {
-  "～": " "
+  "～": " ",
+  "Ｘ": " ",
+  "Ｖ": " ",
+  "Ｉ": " "
 }

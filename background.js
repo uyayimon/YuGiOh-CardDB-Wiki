@@ -25,7 +25,7 @@ const discernUrl = (target) => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (discernUrl(tab.url))
-    chrome.action.show(tabId);
+    chrome.action.enable(tabId);
 });
 
 
@@ -85,12 +85,7 @@ const getCardName = (currentPageName, currentPageUrl) => {
     // 機種依存文字を含む名前に変換
     replacePDC('wiki_name', 'official_name');
 
-    // アルファベット→ローマ数字
-    for (const [key, value] of Object.entries(romanNumeralList)) {
-      replacedCardName = replacedCardName.split(value).join(key);
-    }
-
-    // その他、DB検索において認識されない文字を変換
+    // DB検索において認識されない文字を半角スペースに変換
     for (const [key, value] of Object.entries(interconversionCharacterList)) {
       replacedCardName = replacedCardName.split(key).join(value);
     }
