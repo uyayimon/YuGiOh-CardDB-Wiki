@@ -29,6 +29,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 
+// コンテキストメニューを作成
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'key_page_navigation',
+    title: '遊戯王DB⇔Wiki',
+  });
+});
+
+
 const getCardName = (currentPageName, currentPageUrl) => {
   let cardName;
   let replacedCardName;
@@ -142,6 +151,19 @@ chrome.commands.onCommand.addListener((command) => {
 
       if (command == 'key_google_search')
         navigatePageDW(`https://www.google.com/search?q=${result.name1}`);
+    }
+  });
+});
+
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  chrome.tabs.query(queryinfo, (tab) => {
+    if (!discernUrl(tab[0].url)) return;
+    else {
+      const result = getCardName(tab[0].title, tab[0].url)
+
+      if (info.menuItemId == 'key_page_navigation')
+        navigatePageDW(result.link);
     }
   });
 });
