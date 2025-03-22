@@ -31,9 +31,75 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // コンテキストメニューを作成
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'key_page_navigation',
+
+  const contextParent = chrome.contextMenus.create({
+    id: 'context_key_page_navigation',
     title: '遊戯王DB⇔Wiki',
+    contexts: ["all"]
+  });
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: 'context_wiki_page_navigation',
+    title: '遊戯王カードWikiで表示',
+    documentUrlPatterns: [
+      "https://www.db.yugioh-card.com/*/*cid*"
+    ],
+    contexts: ["all"]
+  });
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: 'context_db_page_navigation',
+    title: '遊戯王公式データベースで検索',
+    documentUrlPatterns: [
+      "https://yugioh-wiki.net/*%A1%D4%*",
+      "https://rush.yugioh-wiki.net/*%E3%80%8A*",
+      "https://yugioh-wiki.net/*%E3%80%8A*"
+    ],
+    contexts: ["all"]
+  });
+  // セパレータ
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: "separator1",
+    type: "separator",
+    documentUrlPatterns: [
+      "https://www.db.yugioh-card.com/*/*cid*",
+      "https://yugioh-wiki.net/*%A1%D4%*",
+      "https://rush.yugioh-wiki.net/*%E3%80%8A*",
+      "https://yugioh-wiki.net/*%E3%80%8A*"
+    ],
+    contexts: ["all"]
+  });
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: 'context_google_search',
+    title: 'カード名をGoogle検索',
+    documentUrlPatterns: [
+      "https://www.db.yugioh-card.com/*/*cid*",
+      "https://yugioh-wiki.net/*%A1%D4%*",
+      "https://rush.yugioh-wiki.net/*%E3%80%8A*",
+      "https://yugioh-wiki.net/*%E3%80%8A*"
+    ],
+    contexts: ["all"]
+  });
+  // セパレータ
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: "separator2",
+    type: "separator",
+    contexts: ["selection"]
+  });
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: 'context_select_db_search',
+    title: '選択テキストを遊戯王OCGデータベースで検索',
+    contexts: ["selection"]
+  });
+  chrome.contextMenus.create({
+    parentId: contextParent,
+    id: 'context_select_rush_db_search',
+    title: '選択テキストをラッシュデュエルデータベースで検索',
+    contexts: ["selection"]
   });
 });
 
@@ -158,12 +224,32 @@ chrome.commands.onCommand.addListener((command) => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   chrome.tabs.query(queryinfo, (tab) => {
-    if (!discernUrl(tab[0].url)) return;
-    else {
-      const result = getCardName(tab[0].title, tab[0].url)
+    const result = getCardName(tab[0].title, tab[0].url)
+    let navPageUrl;
+    let searchWord;
 
-      if (info.menuItemId == 'key_page_navigation')
-        navigatePageDW(result.link);
+    switch (info.menuItemId) {
+      case "context_wiki_page_navigation":
+        navPageUrl = result.link;
+        break;
+      case "context_db_page_navigation":
+        navPageUrl = result.link;
+        break;
+      case "context_google_search":
+        navPageUrl = `https://www.google.com/search?q=${result.name1}`;
+        break;
+      case "context_select_db_search":
+        searchWord = info.selectionText;
+        navPageUrl = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${encodeURI(searchWord)}`;
+        break;
+      case "context_select_rush_db_search":
+        searchWord = info.selectionText;
+        navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${searchWord}`;
+        break;
     }
-  });
+
+    navigatePageDW(navPageUrl);
+  }
+
+  )
 });
