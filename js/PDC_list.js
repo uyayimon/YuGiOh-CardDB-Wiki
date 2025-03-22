@@ -55,11 +55,11 @@ export const interconversionCardList = [
   },
   {
     official_name: "CiNo.1000 夢幻虚光神ヌメロニアス・ヌメロニア",
-    wiki_name: "ＣｉＮｏ.１０００ 夢幻虚光しんヌメロニアス・ヌメロニア"
+    wiki_name: "ＣｉＮｏ.１０００ 夢幻虚光神ヌメロニアス・ヌメロニア"
   },
   {
     official_name: "CNo.1000 夢幻虚神ヌメロニアス",
-    wiki_name: "ＣＮｏ.１０００ 夢幻虚しんヌメロニアス"
+    wiki_name: "ＣＮｏ.１０００ 夢幻虚神ヌメロニアス"
   },
   {
     official_name: "神峰之天津靇",
