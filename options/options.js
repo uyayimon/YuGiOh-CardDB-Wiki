@@ -1,4 +1,4 @@
-const status = document.getElementById('status');
+const messageDisplay = document.getElementById('messageDisplay');
 const editSize = document.getElementById('edit_size');
 const slider = document.getElementById('size_slider');
 const setNavIconDisplayCheck = document.getElementById('setting_nav_icon_display');
@@ -43,9 +43,9 @@ document.getElementById('save').addEventListener('click', () => {
     setting_nav_icon_size: slider.value
 
   }, () => {
-    status.textContent = '保存しました';
+    messageDisplay.textContent = '保存しました';
     setTimeout(() => {
-      status.textContent = '';
+      messageDisplay.textContent = '';
     }, 1500);
   }
   );

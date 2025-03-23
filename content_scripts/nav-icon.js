@@ -24,6 +24,14 @@ const getTooltipText = () => {
   }
 }
 
+const removeNavIcon = () => {
+  const navIcon = document.getElementById('icon_whole');
+  document.body.removeChild(navIcon);
+
+  chrome.storage.sync.set({ icon_position_y: '200px', icon_position_x: '90%' });
+}
+
+
 const displayNavIcon = () => {
   // 要素の生成
   const newElement = document.createElement('div');
@@ -122,15 +130,10 @@ const displayNavIcon = () => {
   document.getElementById('close_btn').addEventListener('click', (event) => {
     event.stopPropagation();
     removeNavIcon();
+    chrome.storage.sync.set({ setting_nav_icon_display: false });
   });
 
 }
-
-const removeNavIcon = () => {
-  const navIcon = document.getElementById('icon_whole');
-  document.body.removeChild(navIcon);
-}
-
 
 chrome.storage.sync.get({
   setting_nav_icon_display: true
