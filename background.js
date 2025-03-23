@@ -179,7 +179,7 @@ const getCardName = (currentPageName, currentPageUrl) => {
 }
 
 
-const navigatePageDW = (adress) => {
+const navigatePage = (adress) => {
   chrome.tabs.query(queryinfo, (tab) => {
     chrome.tabs.create({
       url: adress,
@@ -193,7 +193,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // from nav-icon.js
   if (request.message == 'page_navigation') {
     const result = getCardName(sender.tab.title, sender.tab.url);
-    navigatePageDW(result.link);
+    navigatePage(result.link);
   }
   // from popup.js
   if (request.message == 'get_name&url') {
@@ -213,10 +213,10 @@ chrome.commands.onCommand.addListener((command) => {
       const result = getCardName(tab[0].title, tab[0].url)
 
       if (command == 'key_page_navigation')
-        navigatePageDW(result.link);
+        navigatePage(result.link);
 
       if (command == 'key_google_search')
-        navigatePageDW(`https://www.google.com/search?q=${result.name1}`);
+        navigatePage(`https://www.google.com/search?q=${result.name1}`);
     }
   });
 });
@@ -230,8 +230,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     switch (info.menuItemId) {
       case "context_wiki_page_navigation":
-        navPageUrl = result.link;
-        break;
       case "context_db_page_navigation":
         navPageUrl = result.link;
         break;
@@ -246,9 +244,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         searchWord = info.selectionText;
         navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${searchWord}`;
         break;
+      default:
+        exit()
     }
 
-    navigatePageDW(navPageUrl);
+    navigatePage(navPageUrl);
   }
 
   )
