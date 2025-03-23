@@ -11,6 +11,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     return currentUrl.includes(urlPartial);
   }
 
+  const urlIncludesParts = (target, ...urlPartial) => {
+    return urlPartial.every(element => target.includes(element));
+  }
+
   // to background.js
   chrome.runtime.sendMessage({ message: 'get_name&url' }, (response) => {
     const name1 = response.name1;
@@ -18,7 +22,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
     siteLink.href = response.link;
 
-    if (urlIncludes('www.db.yugioh-card.com')) {
+    if (urlIncludesParts(currentUrl, 'www.db.yugioh-card.com', 'cid=')) {
       if (urlIncludes('rushdb')) {
         siteLinkText.innerText = '《ラッシュデュエルWikiで表示》';
       }
@@ -30,8 +34,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
       document.getElementById('card_name').innerText = name1
     }
 
-
-    else if (urlIncludes('yugioh-wiki.net')) {
+    else if (urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%A1%D4') || urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%E3%80%8A')) {
       if (urlIncludes('rush')) {
         siteLinkText.innerText = 'ラッシュデュエル\nデータベースで検索';
       }
@@ -41,6 +44,20 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
       siteLinkText.classList.add('to_db');
       document.getElementById('card_name').innerText = name2
+    }
+
+    else {
+      siteLinkText.classList.add('disabled');
+      googleSearchLink.classList.add('disabled');
+      googleSearchLinkYugioh.classList.add('disabled');
+      document.getElementById('nav_icon_display').classList.add('disabled');
+
+      document.getElementById('card_name').innerText = 'リンク集';
+      const elements = document.querySelectorAll('.default_link');
+      elements.forEach((element) => {
+        console.log(element.classList);
+        element.classList.remove('disabled');
+      });
     }
 
 
