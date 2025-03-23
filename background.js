@@ -8,7 +8,7 @@ import "./js/encoding.js"
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
 
-import { interconversionCardList, romanNumeralList, interconversionCharacterList } from "./js/PDC_list.js"
+import { interconversionCardList, romanNumeralList, accentedCharacterList, interconversionCharacterList } from "./js/PDC_list.js"
 
 const queryinfo = { active: true, currentWindow: true }
 
@@ -50,12 +50,17 @@ const getCardName = (currentPageName, currentPageUrl) => {
     // 機種依存文字を含まない名前に変換
     replacePDC('official_name', 'wiki_name');
 
-    // ローマ数字→アルファベット
+    // ローマ数字をアルファベットで代用
     for (const [key, value] of Object.entries(romanNumeralList)) {
       replacedCardName = replacedCardName.split(key).join(value);
     }
 
-    // 半角→全角
+    // アクセントがついた文字を代用
+    for (const [key, value] of Object.entries(accentedCharacterList)) {
+      replacedCardName = replacedCardName.split(key).join(value);
+    }
+
+    // 半角を全角に変換
     replacedCardName = replacedCardName.replace(/-/g, '－');
     replacedCardName = replacedCardName.replace(/[A-Za-z0-9]/g, (s) => {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
