@@ -32,22 +32,26 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 // コンテキストメニューを作成
 chrome.runtime.onInstalled.addListener(() => {
 
-  const contextParent = chrome.contextMenus.create({
+  const contextParent1 = chrome.contextMenus.create({
     id: 'context_key_page_navigation',
     title: '遊戯王DB⇔Wiki',
-    contexts: ["all"]
+    documentUrlPatterns: [
+      "https://www.db.yugioh-card.com/*/*cid*",
+      "https://yugioh-wiki.net/*%A1%D4%*",
+      "https://rush.yugioh-wiki.net/*%E3%80%8A*",
+      "https://yugioh-wiki.net/*%E3%80%8A*"
+    ],
   });
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent1,
     id: 'context_wiki_page_navigation',
     title: '遊戯王カードWikiで表示',
     documentUrlPatterns: [
       "https://www.db.yugioh-card.com/*/*cid*"
     ],
-    contexts: ["all"]
   });
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent1,
     id: 'context_db_page_navigation',
     title: '遊戯王公式データベースで検索',
     documentUrlPatterns: [
@@ -55,11 +59,10 @@ chrome.runtime.onInstalled.addListener(() => {
       "https://rush.yugioh-wiki.net/*%E3%80%8A*",
       "https://yugioh-wiki.net/*%E3%80%8A*"
     ],
-    contexts: ["all"]
   });
   // セパレータ
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent1,
     id: "separator1",
     type: "separator",
     documentUrlPatterns: [
@@ -68,10 +71,9 @@ chrome.runtime.onInstalled.addListener(() => {
       "https://rush.yugioh-wiki.net/*%E3%80%8A*",
       "https://yugioh-wiki.net/*%E3%80%8A*"
     ],
-    contexts: ["all"]
   });
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent1,
     id: 'context_google_search',
     title: 'カード名をGoogle検索',
     documentUrlPatterns: [
@@ -80,23 +82,20 @@ chrome.runtime.onInstalled.addListener(() => {
       "https://rush.yugioh-wiki.net/*%E3%80%8A*",
       "https://yugioh-wiki.net/*%E3%80%8A*"
     ],
-    contexts: ["all"]
   });
-  // セパレータ
-  chrome.contextMenus.create({
-    parentId: contextParent,
-    id: "separator2",
-    type: "separator",
+  const contextParent2 = chrome.contextMenus.create({
+    id: 'context_key_page_navigation_select',
+    title: '遊戯王DB⇔Wiki',
     contexts: ["selection"]
   });
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent2,
     id: 'context_select_db_search',
     title: '選択テキストを遊戯王OCGデータベースで検索',
     contexts: ["selection"]
   });
   chrome.contextMenus.create({
-    parentId: contextParent,
+    parentId: contextParent2,
     id: 'context_select_rush_db_search',
     title: '選択テキストをラッシュデュエルデータベースで検索',
     contexts: ["selection"]
