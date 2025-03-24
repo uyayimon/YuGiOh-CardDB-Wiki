@@ -249,7 +249,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${searchWord}`;
         break;
       default:
-        exit()
+        return;
     }
 
     navigatePage(navPageUrl);
