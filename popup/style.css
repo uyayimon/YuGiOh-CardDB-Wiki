@@ -25,7 +25,7 @@ a:hover, a.link:hover>.link_text, #site_link_text:hover {
 }
 .google_search {
   color: #333;
-  margin: 5px auto;
+  margin: 3px auto;
   background: antiquewhite;
 }
 #google_link_yugioh_text {
@@ -46,7 +46,11 @@ a:hover, a.link:hover>.link_text, #site_link_text:hover {
 .no_mgn {
   margin: 0;
 }
+.disabled {
+  display: none;
+}
 
+/* For Firefox */
 @-moz-document url-prefix() {
   a {
     font-size: 1em;

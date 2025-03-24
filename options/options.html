@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>遊戯王DB⇔Wiki オプションページ</title>
     <style>
-      label{
+      label {
         cursor: pointer;
         user-select: none;
       }
@@ -17,29 +17,42 @@
     <h1>設定</h1>
     <h2>ナビゲーションアイコン</h2>
     <ul id="setting">
-
       <li class="setting_item">
         <label>
           ナビゲーションアイコンを表示する
-          <input type="checkbox" id="setting_nav_icon_display" checked/>
+          <input type="checkbox" id="setting_nav_icon_display" checked />
         </label>
       </li>
 
       <li class="setting_item" id="setting_nav_icon_size">
         <div>
           <p>ナビゲーションアイコンの表示サイズ（16～128px）</p>
-          <p><input type="range" id="size_slider" value="48" min="16" max="128" step="2">
-            (縦・横 <span id="edit_size"></span> px)</p>
+          <p>
+            <input
+              type="range"
+              id="size_slider"
+              value="48"
+              min="16"
+              max="128"
+              step="2"
+            />
+            (縦・横 <span id="edit_size"></span> px)
+          </p>
         </div>
-        <div>表示サイズ：
-          <img id="icon_example" src="../icons/iconDW-128x128.png" alt="navicon">
+        <div>
+          表示サイズ：
+          <img
+            id="icon_example"
+            src="../icons/iconDW-128x128.png"
+            alt="navicon"
+          />
         </div>
       </li>
     </ul>
 
     <div id="buttons_wrapper">
       <button id="save">保存</button>
-      <span id="status"></span>
+      <span id="messageDisplay"></span>
     </div>
 
     <script src="options.js"></script>

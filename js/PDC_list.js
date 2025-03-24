@@ -150,8 +150,36 @@ export const romanNumeralList = {
   "Ⅰ": "Ｉ"
 }
 
+// アクセント符号付きの文字の変換（Wiki向け）
+export const accentedCharacterList = {
+  // Grave accent
+  "À": "Ａ",
+  "à": "ａ",
+  "È": "Ｅ",
+  "è": "ｅ",
+  "Ì": "Ｉ",
+  "ì": "ｉ",
+  "Ò": "Ｏ",
+  "ò": "ｏ",
+  "Ù": "Ｕ",
+  "ù": "ｕ",
+  // Acute accent
+  "Á": "Ａ",
+  "á": "ａ",
+  "É": "Ｅ",
+  "é": "ｅ",
+  "Ó": "Ｏ",
+  "ó": "ｏ",
+  "Ú": "Ｕ",
+  "Ú": "ｕ",
+  // Umlaut
+  "ä": "ａ",
+  "ö": "ｏ",
+  "ü": "ｕ"
+}
 
-// 文字の変換（DB検索対策）
+
+// 特定の文字の変換（DB検索対策）
 export const interconversionCharacterList = {
   "～": " ",
   "“": " ",
