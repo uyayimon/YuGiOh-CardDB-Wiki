@@ -5,89 +5,105 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <p class="no_mgn" id="card_name"></p>
+    <div class="default_element disabled">
+      <p class="no_mgn"></p>
+      <hr class="" />
+      <a
+        class="link"
+        id="db_ocg_link"
+        href="https://www.db.yugioh-card.com/yugiohdb/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text default_element_text to_db">
+          遊戯王OCGデータベース
+        </p>
+      </a>
 
-    <hr />
+      <a
+        class="link"
+        id="wiki_ocg_link"
+        href="https://yugioh-wiki.net/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text default_element_text to_wiki">遊戯王カードWiki</p>
+      </a>
 
-    <a
-      class="link variable_link"
-      id="site_link"
-      href=""
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text" id="site_link_text"></p>
-    </a>
+      <p class="no_mgn"></p>
+      <hr class="" />
 
-    <a
-      class="link default_link disabled"
-      id="db_ocg_link"
-      href="https://www.db.yugioh-card.com/yugiohdb/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text to_db">遊戯王OCGデータベース</p>
-    </a>
+      <a
+        class="link"
+        id="db_rush_link"
+        href="https://www.db.yugioh-card.com/rushdb/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text default_element_text to_db">
+          ラッシュデュエルデータベース
+        </p>
+      </a>
 
-    <a
-      class="link default_link disabled"
-      id="wiki_ocg_link"
-      href="https://yugioh-wiki.net/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text to_wiki">《遊戯王カードWiki》</p>
-    </a>
+      <a
+        class="link"
+        id="wiki_rush_link"
+        href="https://rush.yugioh-wiki.net/index.php?FrontPage"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text default_element_text to_wiki">
+          ラッシュデュエルWiki
+        </p>
+      </a>
 
-    <a
-      class="link default_link disabled"
-      id="db_rush_link"
-      href="https://www.db.yugioh-card.com/rushdb/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text to_db">ラッシュデュエルデータベース</p>
-    </a>
+      <hr />
+    </div>
 
-    <a
-      class="link default_link disabled"
-      id="wiki_rush_link"
-      href="https://rush.yugioh-wiki.net/index.php?FrontPage"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text to_wiki">《ラッシュデュエルWiki》</p>
-    </a>
+    <div class="variable_element">
+      <p class="no_mgn" id="card_name"></p>
+      <hr class="" />
+      <a
+        class="link"
+        id="site_link"
+        href=""
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text" id="site_link_text"></p>
+      </a>
 
-    <a
-      class="link variable_link"
-      id="google_search_link"
-      href=""
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text google_search" id="google_link_text">
-        カード名をGoogle検索
-      </p>
-    </a>
+      <a
+        class="link"
+        id="google_search_link"
+        href=""
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text google_search" id="google_link_text">
+          カード名をGoogle検索
+        </p>
+      </a>
 
-    <a
-      class="link variable_link"
-      id="google_search_link_yugioh"
-      href="#"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <p class="link_text google_search" id="google_link_yugioh_text">
-        「遊戯王」を含めてGoogle検索
-      </p>
-    </a>
+      <a
+        class="link"
+        id="google_search_link_yugioh"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <p class="link_text google_search" id="google_link_yugioh_text">
+          「遊戯王」を含めてGoogle検索
+        </p>
+      </a>
 
-    <hr />
-    <label id="nav_icon_display">
-      ナビゲーションアイコンを表示
-      <input type="checkbox" id="display_nav_icon" />
-    </label>
+      <hr />
+
+      <label id="nav_icon_display">
+        ナビゲーションアイコンを表示
+        <input type="checkbox" id="display_nav_icon" />
+      </label>
+    </div>
 
     <p id="to_about_text">
       <a

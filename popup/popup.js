@@ -16,7 +16,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   }
 
   // to background.js
-  chrome.runtime.sendMessage({ message: 'get_name&url' }, (response) => {
+  chrome.runtime.sendMessage({ message: 'get_name_url' }, (response) => {
     const name1 = response.name1;
     const name2 = response.name2;
 
@@ -47,15 +47,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     }
 
     else {
-      const variable_links = document.querySelectorAll('.variable_link');
-      variable_links.forEach((element) => {
+      const variable_elements = document.querySelectorAll('.variable_element');
+      variable_elements.forEach((element) => {
         element.classList.add('disabled');
       });
-      document.getElementById('nav_icon_display').classList.add('disabled');
-
-      document.getElementById('card_name').innerText = 'リンク集';
-      const default_links = document.querySelectorAll('.default_link');
-      default_links.forEach((element) => {
+      const default_elements = document.querySelectorAll('.default_element');
+      default_elements.forEach((element) => {
         element.classList.remove('disabled');
       });
     }

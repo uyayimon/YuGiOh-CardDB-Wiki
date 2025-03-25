@@ -4,24 +4,33 @@ html {
 body {
   width: 260px;
   background: #fff;
-  padding: 10px;
+  padding: 8px;
+  font-family: 'Arial', sans-serif;
 }
 label {
   user-select: none;
   cursor: pointer;
 }
-a {
-  font-size: 1.3em;
+a.link {
+  font-size: 1.2em;
   text-decoration: none;
+  display: block;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 a:hover, a.link:hover>.link_text, #site_link_text:hover {
   opacity: 0.8;
+  transform: scale(1.01);
 }
 .link_text {
-  text-align: center;
-  border: 1px grey solid;
-  padding: 15px 5px;
-  margin-bottom: 15px;
+  border: none;
+  padding: 12px 5px;
+}
+.default_element_text {
+  border: none;
+  padding: 6px 4px;
 }
 .google_search {
   color: #333;
