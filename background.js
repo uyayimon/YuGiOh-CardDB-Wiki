@@ -10,7 +10,7 @@ import "./js/encoding.js"
 
 import { interconversionCardList, romanNumeralList, accentedCharacterList, interconversionCharacterList } from "./js/PDC_list.js"
 
-const queryinfo = { active: true, currentWindow: true }
+const queryInfo = { active: true, currentWindow: true }
 
 const urlIncludesParts = (target, ...urlPartial) =>
   urlPartial.every(element => target.includes(element));
@@ -184,7 +184,7 @@ const getCardName = (currentPageName, currentPageUrl) => {
 
 
 const navigatePage = (adress) => {
-  chrome.tabs.query(queryinfo, (tab) => {
+  chrome.tabs.query(queryInfo, (tab) => {
     chrome.tabs.create({
       url: adress,
       index: tab[0].index + 1
@@ -200,8 +200,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     navigatePage(result.link);
   }
   // from popup.js
-  if (request.message == 'get_name&url') {
-    chrome.tabs.query(queryinfo, (tab) => {
+  if (request.message == 'get_name_url') {
+    chrome.tabs.query(queryInfo, (tab) => {
       const result = getCardName(tab[0].title, tab[0].url)
       sendResponse(result);
     });
@@ -211,7 +211,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 chrome.commands.onCommand.addListener((command) => {
-  chrome.tabs.query(queryinfo, (tab) => {
+  chrome.tabs.query(queryInfo, (tab) => {
     if (!discernUrl(tab[0].url)) return;
     else {
       const result = getCardName(tab[0].title, tab[0].url)
@@ -227,7 +227,7 @@ chrome.commands.onCommand.addListener((command) => {
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  chrome.tabs.query(queryinfo, (tab) => {
+  chrome.tabs.query(queryInfo, (tab) => {
     const result = getCardName(tab[0].title, tab[0].url)
     let navPageUrl;
     let searchWord;
