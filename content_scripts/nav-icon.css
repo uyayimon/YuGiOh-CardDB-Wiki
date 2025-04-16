@@ -40,8 +40,12 @@
   visibility: visible;
 }
 
-.to_db {
-  background: #555;
+.to_ocg_db {
+  background: #12243c;
+  color: #fff;
+}
+.to_rush_db {
+  background: rgba(84, 27, 16, 1);
   color: #fff;
 }
 .to_wiki {

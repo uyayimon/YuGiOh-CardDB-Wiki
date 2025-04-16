@@ -53,7 +53,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     parentId: contextParent1,
     id: 'context_db_page_navigation',
-    title: '遊戯王公式データベースで検索',
+    title: '遊戯王ニューロンデータベースで検索',
     documentUrlPatterns: [
       "https://yugioh-wiki.net/*%A1%D4%*",
       "https://rush.yugioh-wiki.net/*%E3%80%8A*",

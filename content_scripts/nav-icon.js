@@ -14,8 +14,11 @@ const getTooltipText = () => {
   }
 
   else if (urlIncludes('yugioh-wiki.net')) {
-    navText = '公式データベースで検索';
-    navClass = 'to_db';
+    navText = 'ニューロンデータベースで検索';
+    if (urlIncludes('rush'))
+      navClass = 'to_rush_db';
+    else
+      navClass = 'to_ocg_db';
   }
 
   return {
