@@ -36,13 +36,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
     else if (urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%A1%D4') || urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%E3%80%8A')) {
       if (urlIncludes('rush')) {
-        siteLinkText.innerText = 'ラッシュデュエル\nデータベースで検索';
+        siteLinkText.innerText = '遊戯王ニューロンで検索\n(ラッシュデュエルデータベース)';
+        siteLinkText.classList.add('to_rush_db');
       }
       else {
-        siteLinkText.innerText = '遊戯王OCGデータベースで検索';
+        siteLinkText.innerText = '遊戯王ニューロンで検索\n(OCGデータベース)';
+        siteLinkText.classList.add('to_ocg_db');
       }
 
-      siteLinkText.classList.add('to_db');
       document.getElementById('card_name').innerText = name2
     }
 
