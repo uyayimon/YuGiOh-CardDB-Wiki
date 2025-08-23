@@ -17,7 +17,7 @@ a.link {
   display: block;
   text-align: center;
   border-radius: 5px;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 a:hover, a.link:hover>.link_text, #site_link_text:hover {
@@ -30,7 +30,7 @@ a:hover, a.link:hover>.link_text, #site_link_text:hover {
 }
 .default_element_text {
   border: none;
-  padding: 6px 4px;
+  padding: 8px 4px;
 }
 .google_search {
   color: #333;

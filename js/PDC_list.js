@@ -18,8 +18,12 @@ export const interconversionCardList = [
     wiki_name: "機巧辰－高闇御津羽オカミ"
   },
   {
-    official_name: "登竜華恐巄門",
-    wiki_name: "登竜華恐ろう門"
+    official_name: "恐巄竜華－㟴巴",
+    wiki_name: "恐ろう竜華－かい巴"
+  },
+  {
+    official_name: "熒焅聖 アレクゥス",
+    wiki_name: "けいこく聖 アレクゥス"
   },
   {
     official_name: "ユベル－Das Ewig Liebe Wächter",
@@ -70,8 +74,8 @@ export const interconversionCardList = [
     wiki_name: "炎舞－「天キ」"
   },
   {
-    official_name: "恐巄竜華－㟴巴",
-    wiki_name: "恐ろう竜華－かい巴"
+    official_name: "登竜華恐巄門",
+    wiki_name: "登竜華恐ろう門"
   },
   {
     official_name: "Nouvellez Auberge 『À Table』",
@@ -92,12 +96,20 @@ export const interconversionCardList = [
 
   // 機種依存文字の読み方がカード名の読み方と一致しないカード
   {
+    official_name: "糾罪巧ϝ’－「tromarIA」",
+    wiki_name: "糾罪巧エクト’－「ｔｒｏｍａｒＩＡ」"
+  },
+  {
     official_name: "白棘鱏",
     wiki_name: "ホワイト・スティングレイ"
   },
   {
     official_name: "白鱓",
     wiki_name: "ホワイト・モーレイ"
+  },
+  {
+    official_name: "糾罪巧－Atoriϝ.MAR",
+    wiki_name: "糾罪巧－アトリマール"
   },
   {
     official_name: "絶火の祆現",
