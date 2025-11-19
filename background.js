@@ -8,26 +8,122 @@ import "./js/encoding.js"
 // https://github.com/polygonplanet/encoding.js/blob/master/LICENSE
 
 
-import { interconversionCardList, romanNumeralList, accentedCharacterList, interconversionCharacterList } from "./js/PDC_list.js"
+async function checkInterconversionListVer() {
+  // リモートファイルの読み込み
+  try {
+    const url = "https://raw.githubusercontent.com/uyayimon/YuGiOh-CardDB-Wiki_cardList/refs/heads/main/list_version.json";
+    const res = await fetch(url);
+    const remoteVersion = (await res.json()).version;
 
-const queryInfo = { active: true, currentWindow: true }
+    const { interconversion_meta } = await chrome.storage.local.get("interconversion_meta");
 
-const urlIncludesParts = (target, ...urlPartial) =>
-  urlPartial.every(element => target.includes(element));
+    console.log("current version:", interconversion_meta ? interconversion_meta.version : null);
+    console.log("new version:", remoteVersion);
 
-const discernUrl = (target) => {
-  if (urlIncludesParts(target, 'www.db.yugioh-card.com', 'cid=') ||
-    urlIncludesParts(target, 'yugioh-wiki.net', '%A1%D4') ||
-    urlIncludesParts(target, 'yugioh-wiki.net', '%E3%80%8A')) {
-    return true;
+    return (!interconversion_meta || interconversion_meta.version < remoteVersion) ? remoteVersion : null;
+
+  } catch (error) {
+    console.error("リモートバージョンファイルの読み込みに失敗しました:", error);
+    return null;
   }
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (discernUrl(tab.url))
-    chrome.action.enable(tabId);
-});
+async function loadInterconversionListUpdated() {
+  const updatedVersion = await checkInterconversionListVer();
 
+  if (!updatedVersion) return false; // 更新なし
+
+  // リモートファイルの読み込み
+  try {
+    const url = "https://raw.githubusercontent.com/uyayimon/YuGiOh-CardDB-Wiki_cardList/refs/heads/main/interconversion_list.json";
+    const res = await fetch(url);
+    const jsonData = await res.json();
+
+    await chrome.storage.local.set({
+      interconversion_meta: { version: updatedVersion },
+      interconversion_list: jsonData.data
+    });
+
+    console.log("Interconversion list updated:", jsonData.version);
+  } catch (error) {
+    console.error("リモートカードリストファイルの読み込みに失敗しました:", error);
+  }
+
+  let { interconversion_list } = await chrome.storage.local.get("interconversion_list");
+
+  // fallback: storageに未ロードなら内臓リストから読み込み
+  if (!interconversion_list) {
+    console.warn("interconversion_list not loaded. load in js/interconversion_list.json ...");
+    try {
+      let url = chrome.runtime.getURL("js/interconversion_list.json");
+      let res = await fetch(url);
+      let jsonData = await res.json();
+
+      await chrome.storage.local.set({
+        interconversion_meta: { version: jsonData.version },
+        interconversion_list: jsonData.data
+      });
+      console.log("Interconversion list updated:", jsonData.version);
+    } catch (error) {
+      console.error("機種依存文字変換リストの読み込みに失敗しました:", error);
+    }
+  }
+
+  // 最終確認: storageから取得できるかチェック
+  const { interconversion_list: finalPdcList } = await chrome.storage.local.get("interconversion_list");
+  if (!finalPdcList) {
+    console.error("機種依存文字変換リストの読み込みに失敗しました:");
+  }
+}
+
+// 起動時更新
+chrome.runtime.onInstalled.addListener(loadInterconversionListUpdated);
+chrome.runtime.onStartup.addListener(loadInterconversionListUpdated);
+
+const queryInfo = { active: true, currentWindow: true }
+
+/**
+ * URLオブジェクトから現在のページのタイプを判定する
+ * @param {string} urlString - URL文字列
+ * @returns {'OCG_DB' | 'RUSH_DB' | 'OCG_WIKI' | 'RUSH_WIKI' | 'UNKNOWN'}
+ */
+const getUrlType = (urlString) => {
+  try {
+    const url = new URL(urlString);
+    const host = url.host;
+    const pathAndSearch = url.pathname + url.search;
+    // test
+    console.log(url, host, pathAndSearch)
+
+    // A. OCG/RUSH DB 判定 (db.yugioh-card.com and cid=)
+    if (host.includes('db.yugioh-card.com') && pathAndSearch.includes('cid')) {
+      return pathAndSearch.includes('rushdb') ? 'RUSH_DB' : 'OCG_DB';
+    }
+
+    // B. OCG/RUSH Wiki 判定 (yugioh-wiki.net and specific symbols)
+    if (host.includes('yugioh-wiki.net') && (pathAndSearch.includes('%A1%D4') || pathAndSearch.includes('%E3%80%8A'))) {
+      return host.includes('rush') ? 'RUSH_WIKI' : 'OCG_WIKI';
+    }
+
+  } catch (e) {
+    return 'UNKNOWN';
+  }
+};
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // URLがまだ読み込まれていないか、変更がない場合はスキップ
+  if (changeInfo.status !== 'complete' || !tab.url) {
+    return;
+  }
+
+  // URLタイプを判定
+  const urlType = getUrlType(tab.url);
+
+  // 判定されたURLタイプがKNOWN（該当サイト）の場合にのみ、アクションアイコンを有効化
+  if (urlType !== 'UNKNOWN') {
+    chrome.action.enable(tabId);
+  }
+});
 
 // コンテキストメニューを作成
 chrome.runtime.onInstalled.addListener(() => {
@@ -103,87 +199,126 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 
-const getCardName = (currentPageName, currentPageUrl) => {
+/**
+ * 現在のページ情報からカード名を取得し、ナビゲーション用のURLを作成する
+ */
+const getCardName = async (currentPageName, currentPageUrl) => {
+  const urlObject = new URL(currentPageUrl);
+  const urlType = getUrlType(urlObject);
+
+  // UNKNOWNの場合は処理を中断
+  if (urlType === 'UNKNOWN') {
+    console.warn("URL type is UNKNOWN, skipping card name processing.");
+    return null;
+  }
+
+  // JSONから取得し、storageに保持してある値
+  const { interconversion_list } = await chrome.storage.local.get("interconversion_list");
+  if (!interconversion_list) {
+    console.error("機種依存文字変換リストの読み込みに失敗しました:");
+    return null;
+  }
+
+  const {
+    interconversionCardList,
+    romanNumeralList,
+    accentedCharacterList,
+    interconversionCharacterList
+  } = interconversion_list;
+
   let cardName;
   let replacedCardName;
   let navPageUrl;
 
+  // 関数: カード名リストによる置換
   const replacePDC = (writing1, writing2) => {
-    const foundCardName = interconversionCardList.find((pdcKey) => pdcKey[writing1] == cardName);
-
-    if (foundCardName != undefined)
-      replacedCardName = foundCardName[writing2];
-    else
-      replacedCardName = cardName;
+    const foundCardName = interconversionCardList.find((pdcKey) => pdcKey[writing1] === cardName);
+    replacedCardName = (foundCardName !== undefined) ? foundCardName[writing2] : cardName;
   }
 
-  if (urlIncludesParts(currentPageUrl, 'www.db.yugioh-card.com')) {
-    const barPosition = currentPageName.indexOf(' | ');
-    cardName = currentPageName.substr(0, barPosition);
+  // URLタイプに応じて処理を分岐
+  switch (urlType) {
+    case 'OCG_DB':
+    case 'RUSH_DB': {
+      // ページタイトルからカード名を取得
+      const barPosition = currentPageName.indexOf(' | ');
+      cardName = currentPageName.substring(0, barPosition);
 
-    // 機種依存文字を含まない名前に変換
-    replacePDC('official_name', 'wiki_name');
+      // 機種依存文字を含まない名前に変換
+      replacePDC('official_name', 'wiki_name');
 
-    // ローマ数字をアルファベットで代用
-    for (const [key, value] of Object.entries(romanNumeralList)) {
-      replacedCardName = replacedCardName.split(key).join(value);
-    }
+      // ローマ数字・アクセント文字の置換
+      [romanNumeralList, accentedCharacterList].forEach(list => {
+        for (const [key, value] of Object.entries(list)) {
+          replacedCardName = replacedCardName.split(key).join(value);
+        }
+      });
 
-    // アクセントがついた文字を代用
-    for (const [key, value] of Object.entries(accentedCharacterList)) {
-      replacedCardName = replacedCardName.split(key).join(value);
-    }
+      // 半角記号・英数字の全角への変換
+      replacedCardName = replacedCardName.replace(/-/g, '－');
+      replacedCardName = replacedCardName.replace(/[A-Za-z0-9]/g, (s) => {
+        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+      });
 
-    // 半角を全角に変換
-    replacedCardName = replacedCardName.replace(/-/g, '－');
-    replacedCardName = replacedCardName.replace(/[A-Za-z0-9]/g, (s) => {
-      return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
-    });
-
-    if (urlIncludesParts(currentPageUrl, 'rushdb'))
-      navPageUrl = `https://rush.yugioh-wiki.net/index.php?《${replacedCardName}》`;
-
-    else {
-      // エンコード
-      const keywordArray = [];
-      for (let i = 0; i < replacedCardName.length; i++) {
-        keywordArray.push(replacedCardName.charCodeAt(i));
+      // ナビゲーションURLの決定（Wikiへ）
+      if (urlType === 'RUSH_DB') {
+        navPageUrl = `https://rush.yugioh-wiki.net/index.php?《${replacedCardName}》`;
+      } else {
+        // エンコード
+        const keywordArray = [];
+        for (let i = 0; i < replacedCardName.length; i++) {
+          keywordArray.push(replacedCardName.charCodeAt(i));
+        }
+        const keywordArray_euc = [];
+        for (let i = 0; i < replacedCardName.length; i++) {
+          keywordArray_euc.push(replacedCardName.charCodeAt(i));
+        }
+        const eucjpArray = Encoding.convert(keywordArray_euc, 'EUCJP', 'AUTO');
+        const encodedKeyword = Encoding.urlEncode(eucjpArray);
+        navPageUrl = `https://yugioh-wiki.net/index.php?%A1%D4${encodedKeyword}%A1%D5`;
       }
-      const eucjpArray = Encoding.convert(keywordArray, 'EUCJP', 'AUTO');
-      const encodedKeyword = Encoding.urlEncode(eucjpArray);
+      break;
+    }
 
-      navPageUrl = `https://yugioh-wiki.net/index.php?%A1%D4${encodedKeyword}%A1%D5`;
+    case 'OCG_WIKI':
+    case 'RUSH_WIKI': {
+      // ページタイトルからカード名を取得（《...》の部分）
+      const leftBracket = currentPageName.indexOf('《');
+      const rightBracket = currentPageName.indexOf('》');
+      cardName = currentPageName.substring((leftBracket + 1), rightBracket);
+
+      // 機種依存文字を含む名前に変換 (DB検索用)
+      replacePDC('wiki_name', 'official_name');
+
+      // DB検索で認識されない文字を半角スペースに変換
+      for (const [key, value] of Object.entries(interconversionCharacterList)) {
+        replacedCardName = replacedCardName.split(key).join(value);
+      }
+
+      // ナビゲーションURLの決定（DBへ）
+      if (urlType === 'RUSH_WIKI') {
+        // RUSH DB 検索
+        navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${replacedCardName}`;
+      } else {
+        // OCG DB 検索 (encodeURIを使用)
+        navPageUrl = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${encodeURI(replacedCardName)}`;
+      }
+      break;
     }
   }
 
-  if (urlIncludesParts(currentPageUrl, 'yugioh-wiki.net')) {
-    const leftBracket = currentPageName.indexOf('《');
-    const rightBracket = currentPageName.indexOf('》');
-    cardName = currentPageName.substring((leftBracket + 1), (rightBracket));
-
-    // 機種依存文字を含む名前に変換
-    replacePDC('wiki_name', 'official_name');
-
-    // DB検索において認識されない文字を半角スペースに変換
-    for (const [key, value] of Object.entries(interconversionCharacterList)) {
-      replacedCardName = replacedCardName.split(key).join(value);
-    }
-
-    if (urlIncludesParts(currentPageUrl, 'rush'))
-      navPageUrl = `https://www.db.yugioh-card.com/rushdb/card_search.action?ope=1&sess=1&rp=100&keyword=${replacedCardName}`;
-    else
-      navPageUrl = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=1&sess=1&rp=100&page=1&keyword=${encodeURI(replacedCardName)}`;
-  }
+  console.log(navPageUrl) // test
 
   return {
-    name1: cardName,
-    name2: replacedCardName,
-    link: navPageUrl
+    name1: cardName, // 取得元のページでのカード名（例：DBの日本語タイトル）
+    name2: replacedCardName, // 変換後のカード名（例：Wiki名またはDB検索キーワード）
+    link: navPageUrl // ナビゲーション先URL
   }
 }
 
 
 const navigatePage = (adress) => {
+  console.log(adress) // test
   chrome.tabs.query(queryInfo, (tab) => {
     chrome.tabs.create({
       url: adress,
@@ -196,25 +331,37 @@ const navigatePage = (adress) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // from nav-icon.js
   if (request.message == 'page_navigation') {
-    const result = getCardName(sender.tab.title, sender.tab.url);
-    navigatePage(result.link);
+    (async () => {
+      const result = await getCardName(sender.tab.title, sender.tab.url);
+      console.log(result.name1, result.name2, result.link) // test
+      navigatePage(result.link);
+    })();
   }
   // from popup.js
   if (request.message == 'get_name_url') {
-    chrome.tabs.query(queryInfo, (tab) => {
-      const result = getCardName(tab[0].title, tab[0].url)
+    (async () => {
+      // chrome.tabs.query を await で使う
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      const tab = tabs[0];
+      const result = await getCardName(tab.title, tab.url);
+
+      console.log("RESULT:", result.name1, result.name2, result.link); // test
+
       sendResponse(result);
-    });
+    })();
+
+    return true;  // 非同期レスポンスを有効化
   }
-  return true;
 });
 
 
 chrome.commands.onCommand.addListener((command) => {
-  chrome.tabs.query(queryInfo, (tab) => {
-    if (!discernUrl(tab[0].url)) return;
+  chrome.tabs.query(queryInfo, async (tab) => {
+    if (getUrlType(tab[0].url) == 'UNKNOWN') return;
     else {
-      const result = getCardName(tab[0].title, tab[0].url)
+      const result = await getCardName(tab[0].title, tab[0].url)
+      console.log(result.name1, result.name2, result.link) // test
 
       if (command == 'key_page_navigation')
         navigatePage(result.link);
@@ -227,8 +374,9 @@ chrome.commands.onCommand.addListener((command) => {
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  chrome.tabs.query(queryInfo, (tab) => {
-    const result = getCardName(tab[0].title, tab[0].url)
+  chrome.tabs.query(queryInfo, async (tab) => {
+    const result = await getCardName(tab[0].title, tab[0].url)
+    console.log(result.name1, result.name2, result.link) // test
     let navPageUrl;
     let searchWord;
 
@@ -253,7 +401,5 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 
     navigatePage(navPageUrl);
-  }
-
-  )
+  })
 });

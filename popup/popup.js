@@ -1,67 +1,101 @@
 chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
 
-  const siteLink = document.getElementById('site_link');
+  const currentUrlString = tab[0].url;
+  const urlObject = new URL(currentUrlString); const siteLink = document.getElementById('site_link');
   const siteLinkText = document.getElementById('site_link_text');
   const googleSearchLink = document.getElementById('google_search_link');
   const googleSearchLinkYugioh = document.getElementById('google_search_link_yugioh');
 
-  const currentUrl = tab[0].url;
-
-  const urlIncludes = (urlPartial) => {
-    return currentUrl.includes(urlPartial);
+  const changePopupDefault = () => {
+    const variable_elements = document.querySelectorAll('.variable_element');
+    variable_elements.forEach((element) => {
+      element.classList.add('disabled');
+    });
+    const default_elements = document.querySelectorAll('.default_element');
+    default_elements.forEach((element) => {
+      element.classList.remove('disabled');
+    });
   }
 
-  const urlIncludesParts = (target, ...urlPartial) => {
-    return urlPartial.every(element => target.includes(element));
-  }
+  /**
+   * 現在のURLがどの遊戯王関連サイトに該当するかを判定する
+   * @param {URL} url - 現在のページのURLオブジェクト
+   * @returns {'OCG_DB' | 'RUSH_DB' | 'OCG_WIKI' | 'RUSH_WIKI' | 'UNKNOWN'}
+   */
+  const getUrlType = (url) => {
+    const host = url.host;
+    const pathAndSearch = url.pathname + url.search;
 
-  // to background.js
-  chrome.runtime.sendMessage({ message: 'get_name_url' }, (response) => {
-    const name1 = response.name1;
-    const name2 = response.name2;
-
-    siteLink.href = response.link;
-
-    if (urlIncludesParts(currentUrl, 'www.db.yugioh-card.com', 'cid=')) {
-      if (urlIncludes('rushdb')) {
-        siteLinkText.innerText = '《ラッシュデュエルWikiで表示》';
-      }
-      else {
-        siteLinkText.innerText = '《遊戯王カードWikiで表示》';
-      }
-
-      siteLinkText.classList.add('to_wiki');
-      document.getElementById('card_name').innerText = name1
+    if (host.includes('db.yugioh-card.com') && pathAndSearch.includes('cid')) {
+      return pathAndSearch.includes('rushdb') ? 'RUSH_DB' : 'OCG_DB';
     }
 
-    else if (urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%A1%D4') || urlIncludesParts(currentUrl, 'yugioh-wiki.net', '%E3%80%8A')) {
-      if (urlIncludes('rush')) {
-        siteLinkText.innerText = '遊戯王ニューロンで検索\n(ラッシュデュエルデータベース)';
-        siteLinkText.classList.add('to_rush_db');
-      }
-      else {
+    // B. OCG/RUSH Wiki 判定 (yugioh-wiki.net and specific symbols)
+    if (host.includes('yugioh-wiki.net') && (pathAndSearch.includes('%A1%D4') || pathAndSearch.includes('%E3%80%8A'))) {
+      return host.includes('rush') ? 'RUSH_WIKI' : 'OCG_WIKI';
+    }
+
+    return 'UNKNOWN';
+  };
+
+  const urlType = getUrlType(urlObject);
+
+  // 取得したデータとURLタイプに基づいて、ポップアップの要素を設定する
+  const setPopupElements = (name1, name2, link, type) => {
+    // リンク先を設定
+    siteLink.href = link;
+
+    // カード名を設定 (DB系ならname1、Wiki系ならname2を使用)
+    document.getElementById('card_name').innerText =
+      (type === 'OCG_DB' || type === 'RUSH_DB') ? name1 : name2;
+
+    // URLタイプに応じて表示テキストとクラスを設定
+    switch (type) {
+      case 'OCG_DB':
+        siteLinkText.innerText = '《遊戯王カードWikiで表示》';
+        siteLinkText.classList.add('to_wiki');
+        break;
+
+      case 'RUSH_DB':
+        siteLinkText.innerText = '《ラッシュデュエルWikiで表示》';
+        siteLinkText.classList.add('to_wiki');
+        break;
+
+      case 'OCG_WIKI':
         siteLinkText.innerText = '遊戯王ニューロンで検索\n(OCGデータベース)';
         siteLinkText.classList.add('to_ocg_db');
-      }
+        break;
 
-      document.getElementById('card_name').innerText = name2
+      case 'RUSH_WIKI':
+        siteLinkText.innerText = '遊戯王ニューロンで検索\n(ラッシュデュエルデータベース)';
+        siteLinkText.classList.add('to_rush_db');
+        break;
+
+      default:
+        changePopupDefault();
+        return;
     }
 
-    else {
-      const variable_elements = document.querySelectorAll('.variable_element');
-      variable_elements.forEach((element) => {
-        element.classList.add('disabled');
-      });
-      const default_elements = document.querySelectorAll('.default_element');
-      default_elements.forEach((element) => {
-        element.classList.remove('disabled');
-      });
-    }
-
-
+    // Google検索リンクを設定
     googleSearchLink.href = `https://www.google.com/search?q=${name2}`;
     googleSearchLinkYugioh.href = `https://www.google.com/search?q=${name2}\+遊戯王`;
-  });
+  };
+
+
+  // 判定されたURLタイプがKNOWNな場合のみ、バックグラウンドスクリプトにメッセージを送る
+  if (urlType !== 'UNKNOWN') {
+    chrome.runtime.sendMessage({ message: 'get_name_url' }, (response) => {
+      console.log(response);
+      const name1 = response.name1;
+      const name2 = response.name2;
+      const link = response.link;
+
+      setPopupElements(name1, name2, link, urlType);
+    });
+  } else {
+    // 関連性のないページの場合はポップアップをデフォルトのまま表示
+    changePopupDefault();
+  }
 
 
   const displayNavIcon = document.getElementById('display_nav_icon');
