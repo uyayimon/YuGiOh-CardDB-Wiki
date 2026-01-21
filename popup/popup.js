@@ -82,10 +82,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
   };
 
 
-  // 判定されたURLタイプがKNOWNな場合のみ、バックグラウンドスクリプトにメッセージを送る
+  // 判定されたURLタイプがUNKNOWNでない場合、バックグラウンドスクリプトにメッセージを送る
   if (urlType !== 'UNKNOWN') {
     chrome.runtime.sendMessage({ message: 'get_name_url' }, (response) => {
-      console.log(response);
       const name1 = response.name1;
       const name2 = response.name2;
       const link = response.link;

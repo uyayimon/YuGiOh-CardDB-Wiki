@@ -92,8 +92,6 @@ const getUrlType = (urlString) => {
     const url = new URL(urlString);
     const host = url.host;
     const pathAndSearch = url.pathname + url.search;
-    // test
-    console.log(url, host, pathAndSearch)
 
     // A. OCG/RUSH DB 判定 (db.yugioh-card.com and cid=)
     if (host.includes('db.yugioh-card.com') && pathAndSearch.includes('cid')) {
@@ -307,8 +305,6 @@ const getCardName = async (currentPageName, currentPageUrl) => {
     }
   }
 
-  console.log(navPageUrl) // test
-
   return {
     name1: cardName, // 取得元のページでのカード名（例：DBの日本語タイトル）
     name2: replacedCardName, // 変換後のカード名（例：Wiki名またはDB検索キーワード）
@@ -318,7 +314,6 @@ const getCardName = async (currentPageName, currentPageUrl) => {
 
 
 const navigatePage = (adress) => {
-  console.log(adress) // test
   chrome.tabs.query(queryInfo, (tab) => {
     chrome.tabs.create({
       url: adress,
@@ -333,7 +328,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message == 'page_navigation') {
     (async () => {
       const result = await getCardName(sender.tab.title, sender.tab.url);
-      console.log(result.name1, result.name2, result.link) // test
       navigatePage(result.link);
     })();
   }
@@ -345,8 +339,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       const tab = tabs[0];
       const result = await getCardName(tab.title, tab.url);
-
-      console.log("RESULT:", result.name1, result.name2, result.link); // test
 
       sendResponse(result);
     })();
@@ -361,7 +353,6 @@ chrome.commands.onCommand.addListener((command) => {
     if (getUrlType(tab[0].url) == 'UNKNOWN') return;
     else {
       const result = await getCardName(tab[0].title, tab[0].url)
-      console.log(result.name1, result.name2, result.link) // test
 
       if (command == 'key_page_navigation')
         navigatePage(result.link);
@@ -376,7 +367,6 @@ chrome.commands.onCommand.addListener((command) => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   chrome.tabs.query(queryInfo, async (tab) => {
     const result = await getCardName(tab[0].title, tab[0].url)
-    console.log(result.name1, result.name2, result.link) // test
     let navPageUrl;
     let searchWord;
 
